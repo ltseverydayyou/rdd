@@ -638,7 +638,7 @@
       </div>
     </div>
 
-    <script src="js/jszip.min.js"></script>
+        <script src="js/jszip.min.js"></script>
     <script src="js/rdd.js"></script>
 
     <script>
@@ -761,21 +761,21 @@
       });
 
       document.addEventListener("DOMContentLoaded", function () {
-        var url = new URL(window.location.href);
-        var hasQuery = !!url.search && url.search.length > 1;
-        
+        const url = new URL(window.location.href);
+        const hasQuery = url.search && url.search.length > 1;
+
         if (!hasQuery) {
-            formDiv.hidden = false;
-            setStatus("idle", "Idle");
-            setProgress(0, "Waiting to start…");
+          formDiv.hidden = false;
+          setStatus("idle", "Idle");
+          setProgress(0, "Waiting to start…");
+
+        } else {
+          formDiv.hidden = false;
+          setStatus("running", "Downloading");
+          setProgress(0, "Preparing request…");
+          startProgressLoop();
         }
-        else
-        {
-            setStatus("running", "Downloading");
-            setProgress(0, "Preparing request…");
-            startProgressLoop();
-        }
-    });
+      });
     </script>
   </body>
 </html>
