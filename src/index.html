@@ -735,13 +735,21 @@
       });
 
       document.addEventListener("DOMContentLoaded", function () {
-        formDiv.hidden = false;
+        var url = new URL(window.location.href);
+        var hasQuery = !!url.search && url.search.length > 1;
         
-        var f = document.getElementById("downloadForm");
-        if (f) {
-            f.removeAttribute("target");
-            }
-        });
+        if (!hasQuery) {
+            formDiv.hidden = false;
+            setStatus("idle", "Idle");
+            setProgress(0, "Waiting to start…");
+        }
+        else
+        {
+            setStatus("running", "Downloading");
+            setProgress(0, "Preparing request…");
+            startProgressLoop();
+        }
+    });
     </script>
   </body>
 </html>
