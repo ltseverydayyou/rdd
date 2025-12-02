@@ -1,0 +1,48 @@
+name: Update RDD Versions Cache
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+
+jobs:
+  update-versions:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Fetch versions from WEAO
+        run: |
+          mkdir -p api/versions
+
+          curl -sS "https://weao.xyz/api/versions/current" \
+            -H "User-Agent: WEAO-3PService" \
+            -o api/versions/current.json
+
+          curl -sS "https://weao.xyz/api/versions/future" \
+            -H "User-Agent: WEAO-3PService" \
+            -o api/versions/future.json
+
+          curl -sS "https://weao.xyz/api/versions/past" \
+            -H "User-Agent: WEAO-3PService" \
+            -o api/versions/past.json
+
+          curl -sS "https://weao.xyz/api/versions/android" \
+            -H "User-Agent: WEAO-3PService" \
+            -o api/versions/android.json
+
+      - name: Commit and push if changed
+        run: |
+          if git status --porcelain | grep .; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add api/versions/*.json
+            git commit -m "chore: update RDD version cache"
+            git push
+          else
+            echo "No changes to commit"
+          fi
+        env:
+          GIT_TERMINAL_PROMPT: "0"
