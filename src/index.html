@@ -1,727 +1,818 @@
-<meta charset="utf-8">
-<title>
-  RDD – Roblox Deployment Downloader
-</title>
-<link rel="icon" href="favicon.svg">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<style>
-  @import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap");
-  :root {
-  color-scheme: dark;
-  --bg: #020617;
-  --bg-elevated: #020617;
-  --bg-elevated-soft: #020617;
-  --border: #1f2937;
-  --accent: #38bdf8;
-  --accent-soft: rgba(56, 189, 248, 0.15);
-  --accent-strong: #0ea5e9;
-  --text: #e5e7eb;
-  --text-soft: #9ca3af;
-  --danger: #f97373;
-  --success: #4ade80;
-  --radius-lg: 16px;
-  --radius-pill: 999px;
-  --shadow-soft: 0 24px 60px rgba(0, 0, 0, 0.6);
-  }
-  * {
-  box-sizing: border-box;
-  }
-  body {
-  margin: 0;
-  min-height: 100vh;
-  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo,
-  Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-  background: radial-gradient(circle at top, #0f172a 0, #020617 45%);
-  color: var(--text);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-  }
-  .shell {
-  width: 100%;
-  max-width: 880px;
-  background: radial-gradient(circle at top left, #020617 0, #020617 55%)
-  padding-box;
-  border-radius: 24px;
-  border: 1px solid rgba(148, 163, 184, 0.25);
-  box-shadow: var(--shadow-soft);
-  overflow: visible;
-  position: relative;
-  }
-  .shell::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(
-  circle at top,
-  rgba(56, 189, 248, 0.16),
-  transparent 55%
-  );
-  opacity: 0.75;
-  pointer-events: none;
-  }
-  .chrome {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 16px;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.9);
-  background: linear-gradient(90deg, #020617, #020617);
-  position: relative;
-  z-index: 1;
-  }
-  .dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 999px;
-  background: #f97373;
-  }
-  .dot:nth-child(2) {
-  background: #facc15;
-  }
-  .dot:nth-child(3) {
-  background: #22c55e;
-  }
-  .title-bar {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  font-size: 12px;
-  color: var(--text-soft);
-  }
-  .content {
-  position: relative;
-  z-index: 1;
-  padding: 22px 22px 20px 22px;
-  display: grid;
-  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
-  gap: 24px;
-  }
-  @media (max-width: 840px) {
-  .content {
-  grid-template-columns: minmax(0, 1fr);
-  }
-  }
-  .left {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  }
-  .heading {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 12px;
-  }
-  .heading-main {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  }
-  .heading-main h1 {
-  margin: 0;
-  font-size: 18px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  }
-  .heading-main span {
-  font-size: 12px;
-  color: var(--text-soft);
-  }
-  .badge {
-  padding: 4px 10px;
-  border-radius: var(--radius-pill);
-  border: 1px solid rgba(148, 163, 184, 0.6);
-  font-size: 11px;
-  color: var(--text-soft);
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: rgba(15, 23, 42, 0.9);
-  }
-  .badge-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 999px;
-  background: var(--success);
-  box-shadow: 0 0 12px rgba(74, 222, 128, 0.8);
-  }
-  .disclaimer {
-  font-size: 11px;
-  color: var(--text-soft);
-  line-height: 1.4;
-  padding: 10px 12px;
-  border-radius: 12px;
-  border: 1px solid rgba(30, 64, 175, 0.7);
-  background: rgba(15, 23, 42, 0.9);
-  }
-  .disclaimer a {
-  color: var(--accent);
-  text-decoration: none;
-  }
-  .disclaimer a:hover {
-  text-decoration: underline;
-  }
-  form {
-  margin: 0;
-  border-radius: 16px;
-  border: 1px solid var(--border);
-  background: radial-gradient(circle at top left, #020617 0, #020617 50%);
-  padding: 16px 14px 14px 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  }
-  .field-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 10px 14px;
-  }
-  @media (max-width: 640px) {
-  .field-grid {
-  grid-template-columns: minmax(0, 1fr);
-  }
-  }
-  .field {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  font-size: 12px;
-  }
-  label {
-  color: var(--text-soft);
-  }
-  select,
-  input[type="text"],
-  input[type="number"] {
-  border-radius: 10px;
-  border: 1px solid rgba(55, 65, 81, 0.9);
-  background: rgba(15, 23, 42, 0.95);
-  color: var(--text);
-  font: inherit;
-  padding: 6px 8px;
-  outline: none;
-  }
-  select:focus,
-  input[type="text"]:focus,
-  input[type="number"]:focus {
-  border-color: var(--accent-strong);
-  box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.35);
-  }
-  input::placeholder {
-  color: rgba(148, 163, 184, 0.75);
-  }
-  .field-inline {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  }
-  input[type="checkbox"] {
-  width: 14px;
-  height: 14px;
-  accent-color: var(--accent-strong);
-  }
-  .buttons {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  margin-top: 6px;
-  }
-  .btn-row {
-  display: flex;
-  gap: 8px;
-  }
-  button {
-  border-radius: 999px;
-  padding: 7px 14px;
-  border: 1px solid transparent;
-  font: inherit;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-  white-space: nowrap;
-  }
-  .btn-primary {
-  background: radial-gradient(circle at top left, #38bdf8, #0ea5e9);
-  color: #020617;
-  font-weight: 600;
-  min-width: 130px;
-  }
-  .btn-primary:hover {
-  filter: brightness(1.05);
-  }
-  .btn-ghost {
-  background: rgba(15, 23, 42, 0.95);
-  color: var(--text-soft);
-  border-color: rgba(55, 65, 81, 0.95);
-  }
-  .btn-ghost:hover {
-  border-color: rgba(75, 85, 99, 1);
-  color: var(--text);
-  }
-  .status-pill {
-  padding: 4px 10px;
-  border-radius: var(--radius-pill);
-  font-size: 11px;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  border: 1px solid rgba(55, 65, 81, 1);
-  background: rgba(15, 23, 42, 0.95);
-  color: var(--text-soft);
-  position: relative;
-  z-index: 2;
-  }
-  .status-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: var(--radius-pill);
-  background: var(--text-soft);
-  }
-  .status-pill[data-state="idle"] .status-dot {
-  background: var(--text-soft);
-  }
-  .status-pill[data-state="running"] .status-dot {
-  background: var(--accent-strong);
-  box-shadow: 0 0 12px rgba(56, 189, 248, 0.9);
-  }
-  .status-pill[data-state="done"] .status-dot {
-  background: var(--success);
-  box-shadow: 0 0 12px rgba(74, 222, 128, 0.85);
-  }
-  .status-pill[data-state="error"] .status-dot {
-  background: var(--danger);
-  box-shadow: 0 0 12px rgba(248, 113, 113, 0.85);
-  }
-  .right {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  }
-  .panel {
-  border-radius: 16px;
-  border: 1px solid var(--border);
-  background: radial-gradient(circle at top, #020617 0, #020617 40%);
-  padding: 14px 14px 14px 14px;
-  position: relative;
-  }
-  .panel h3 {
-  margin: 0 0 8px 0;
-  font-size: 13px;
-  color: var(--text-soft);
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  }
-  .progress-shell {
-  margin-top: 6px;
-  border-radius: 999px;
-  border: 1px solid rgba(31, 41, 55, 1);
-  background: rgba(15, 23, 42, 0.9);
-  padding: 2px;
-  overflow: hidden;
-  }
-  .progress-track {
-  width: 100%;
-  height: 9px;
-  border-radius: 999px;
-  background: rgba(17, 24, 39, 1);
-  overflow: hidden;
-  position: relative;
-  }
-  .progress-bar {
-  height: 100%;
-  width: 0%;
-  border-radius: 999px;
-  background: linear-gradient(90deg, #38bdf8, #0ea5e9);
-  transition: width 0.3s ease-out;
-  }
-  .progress-label-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 6px;
-  font-size: 11px;
-  color: var(--text-soft);
-  }
-  .toast {
-  font-size: 11px;
-  color: var(--accent);
-  opacity: 0;
-  transform: translateY(4px);
-  transition: opacity 0.2s ease-out, transform 0.2s ease-out;
-  }
-  .toast.show {
-  opacity: 1;
-  transform: translateY(0);
-  }
-  .log-panel {
-  margin-top: 20px;
-  border-radius: 16px;
-  border: 1px solid var(--border);
-  background: radial-gradient(circle at top left, #020617 0, #020617 55%);
-  padding: 10px 10px 8px 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  width: 100%;
-  position: relative;
-  z-index: 1;
-  }
-  .log-header {
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: var(--text-soft);
-  }
-  #consoleText {
-  font-size: 11px;
-  background: rgba(15, 23, 42, 0.95);
-  border-radius: 12px;
-  border: 1px solid rgba(31, 41, 55, 1);
-  padding: 8px 9px;
-  white-space: pre-wrap;
-  max-height: 150px;
-  overflow-y: auto;
-  width: 100%;
-  box-sizing: border-box;
-  display: block;
-  }
-  noscript {
-  position: fixed;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(15, 23, 42, 0.95);
-  z-index: 9999;
-  }
-  noscript p {
-  max-width: 420px;
-  padding: 18px 20px;
-  border-radius: 16px;
-  background: #020617;
-  border: 1px solid #ef4444;
-  color: #fecaca;
-  font-size: 12px;
-  }
-  a[download] {
-  position: absolute;
-  left: -9999px;
-  opacity: 0;
-  pointer-events: none;
-  }
-</style>
-<noscript>
-  <p>
-    This site doesn't work without JavaScript enabled. Please enable JavaScript and reload the page.
-  </p>
-</noscript>
-<div class="shell">
-  <div class="chrome">
-    <div class="dot">
-    </div>
-    <div class="dot">
-    </div>
-    <div class="dot">
-    </div>
-    <div class="title-bar">
-      rdd – roblox deployment downloader
-    </div>
-  </div>
-  <div class="content">
-    <div class="left">
-      <div class="heading">
-        <div class="heading-main">
-          <h1>
-            RDD
-          </h1>
-          <span>
-            Unofficial fork – downloads are still fetched directly from Roblox CDN.
-          </span>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>RDD – Roblox Deployment Downloader</title>
+    <link rel="icon" href="favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap");
+
+      :root {
+        color-scheme: dark;
+        --bg: #020617;
+        --bg-elevated: #020617;
+        --bg-elevated-soft: #020617;
+        --border: #1f2937;
+        --accent: #38bdf8;
+        --accent-soft: rgba(56, 189, 248, 0.15);
+        --accent-strong: #0ea5e9;
+        --text: #e5e7eb;
+        --text-soft: #9ca3af;
+        --danger: #f97373;
+        --success: #4ade80;
+        --radius-lg: 16px;
+        --radius-pill: 999px;
+        --shadow-soft: 0 24px 60px rgba(0, 0, 0, 0.6);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo,
+          Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        background: radial-gradient(circle at top, #0f172a 0, #020617 45%);
+        color: var(--text);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+      }
+
+      .shell {
+        width: 100%;
+        max-width: 880px;
+        background: radial-gradient(circle at top left, #020617 0, #020617 55%)
+          padding-box;
+        border-radius: 24px;
+        border: 1px solid rgba(148, 163, 184, 0.25);
+        box-shadow: var(--shadow-soft);
+        overflow: visible;
+        position: relative;
+      }
+
+      .shell::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          circle at top,
+          rgba(56, 189, 248, 0.16),
+          transparent 55%
+        );
+        opacity: 0.75;
+        pointer-events: none;
+      }
+
+      .chrome {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 16px;
+        border-bottom: 1px solid rgba(15, 23, 42, 0.9);
+        background: linear-gradient(90deg, #020617, #020617);
+        position: relative;
+        z-index: 1;
+      }
+
+      .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 999px;
+        background: #f97373;
+      }
+
+      .dot:nth-child(2) {
+        background: #facc15;
+      }
+
+      .dot:nth-child(3) {
+        background: #22c55e;
+      }
+
+      .title-bar {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        font-size: 12px;
+        color: var(--text-soft);
+      }
+
+      .content {
+        position: relative;
+        z-index: 1;
+        padding: 22px 22px 20px 22px;
+        display: grid;
+        grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+        gap: 24px;
+      }
+
+      @media (max-width: 840px) {
+        .content {
+          grid-template-columns: minmax(0, 1fr);
+        }
+      }
+
+      .left {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .heading {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 12px;
+      }
+
+      .heading-main {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .heading-main h1 {
+        margin: 0;
+        font-size: 18px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .heading-main span {
+        font-size: 12px;
+        color: var(--text-soft);
+      }
+
+      .heading-right {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .badge {
+        padding: 4px 10px;
+        border-radius: var(--radius-pill);
+        border: 1px solid rgba(148, 163, 184, 0.6);
+        font-size: 11px;
+        color: var(--text-soft);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(15, 23, 42, 0.9);
+      }
+
+      .badge-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 999px;
+        background: var(--success);
+        box-shadow: 0 0 12px rgba(74, 222, 128, 0.8);
+      }
+
+      .disclaimer {
+        font-size: 11px;
+        color: var(--text-soft);
+        line-height: 1.4;
+        padding: 10px 12px;
+        border-radius: 12px;
+        border: 1px solid rgba(30, 64, 175, 0.7);
+        background: rgba(15, 23, 42, 0.9);
+      }
+
+      .disclaimer a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+
+      .disclaimer a:hover {
+        text-decoration: underline;
+      }
+
+      form {
+        margin: 0;
+        border-radius: 16px;
+        border: 1px solid var(--border);
+        background: radial-gradient(circle at top left, #020617 0, #020617 50%);
+        padding: 16px 14px 14px 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .field-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: 10px 14px;
+      }
+
+      @media (max-width: 640px) {
+        .field-grid {
+          grid-template-columns: minmax(0, 1fr);
+        }
+      }
+
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        font-size: 12px;
+      }
+
+      label {
+        color: var(--text-soft);
+      }
+
+      select,
+      input[type="text"],
+      input[type="number"] {
+        border-radius: 10px;
+        border: 1px solid rgba(55, 65, 81, 0.9);
+        background: rgba(15, 23, 42, 0.95);
+        color: var(--text);
+        font: inherit;
+        padding: 6px 8px;
+        outline: none;
+      }
+
+      select:focus,
+      input[type="text"]:focus,
+      input[type="number"]:focus {
+        border-color: var(--accent-strong);
+        box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.35);
+      }
+
+      input::placeholder {
+        color: rgba(148, 163, 184, 0.75);
+      }
+
+      .field-inline {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+      }
+
+      input[type="checkbox"] {
+        width: 14px;
+        height: 14px;
+        accent-color: var(--accent-strong);
+      }
+
+      .buttons {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        gap: 8px;
+        margin-top: 6px;
+      }
+
+      .btn-row {
+        display: flex;
+        gap: 8px;
+      }
+
+      button {
+        border-radius: 999px;
+        padding: 7px 14px;
+        border: 1px solid transparent;
+        font: inherit;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        white-space: nowrap;
+      }
+
+      .btn-primary {
+        background: radial-gradient(circle at top left, #38bdf8, #0ea5e9);
+        color: #020617;
+        font-weight: 600;
+        min-width: 130px;
+      }
+
+      .btn-primary:hover {
+        filter: brightness(1.05);
+      }
+
+      .btn-ghost {
+        background: rgba(15, 23, 42, 0.95);
+        color: var(--text-soft);
+        border-color: rgba(55, 65, 81, 0.95);
+      }
+
+      .btn-ghost:hover {
+        border-color: rgba(75, 85, 99, 1);
+        color: var(--text);
+      }
+
+      .status-pill {
+        padding: 4px 10px;
+        border-radius: var(--radius-pill);
+        font-size: 11px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        border: 1px solid rgba(55, 65, 81, 1);
+        background: rgba(15, 23, 42, 0.95);
+        color: var(--text-soft);
+        position: relative;
+        z-index: 2;
+      }
+
+      .status-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: var(--radius-pill);
+        background: var(--text-soft);
+      }
+
+      .status-pill[data-state="idle"] .status-dot {
+        background: var(--text-soft);
+      }
+
+      .status-pill[data-state="running"] .status-dot {
+        background: var(--accent-strong);
+        box-shadow: 0 0 12px rgba(56, 189, 248, 0.9);
+      }
+
+      .status-pill[data-state="done"] .status-dot {
+        background: var(--success);
+        box-shadow: 0 0 12px rgba(74, 222, 128, 0.85);
+      }
+
+      .status-pill[data-state="error"] .status-dot {
+        background: var(--danger);
+        box-shadow: 0 0 12px rgba(248, 113, 113, 0.85);
+      }
+
+      .right {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .panel {
+        border-radius: 16px;
+        border: 1px solid var(--border);
+        background: radial-gradient(circle at top, #020617 0, #020617 40%);
+        padding: 14px;
+        position: relative;
+      }
+
+      .panel h3 {
+        margin: 0 0 8px 0;
+        font-size: 13px;
+        color: var(--text-soft);
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+      }
+
+      .progress-shell {
+        margin-top: 6px;
+        border-radius: 999px;
+        border: 1px solid rgba(31, 41, 55, 1);
+        background: rgba(15, 23, 42, 0.9);
+        padding: 2px;
+        overflow: hidden;
+      }
+
+      .progress-track {
+        width: 100%;
+        height: 9px;
+        border-radius: 999px;
+        background: rgba(17, 24, 39, 1);
+        overflow: hidden;
+        position: relative;
+      }
+
+      .progress-bar {
+        height: 100%;
+        width: 0%;
+        border-radius: 999px;
+        background: linear-gradient(90deg, #38bdf8, #0ea5e9);
+        transition: width 0.3s ease-out;
+      }
+
+      .progress-label-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 6px;
+        font-size: 11px;
+        color: var(--text-soft);
+      }
+
+      .toast {
+        font-size: 11px;
+        color: var(--accent);
+        opacity: 0;
+        transform: translateY(4px);
+        transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+      }
+
+      .toast.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .log-panel {
+        margin-top: 20px;
+        border-radius: 16px;
+        border: 1px solid var(--border);
+        background: radial-gradient(circle at top left, #020617 0, #020617 55%);
+        padding: 10px 10px 8px 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        width: 100%;
+        position: relative;
+        z-index: 1;
+      }
+
+      .log-header {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: var(--text-soft);
+      }
+
+      #consoleText {
+        font-size: 11px;
+        background: rgba(15, 23, 42, 0.95);
+        border-radius: 12px;
+        border: 1px solid rgba(31, 41, 55, 1);
+        padding: 8px 9px;
+        white-space: pre-wrap;
+        max-height: 150px;
+        overflow-y: auto;
+        width: 100%;
+        box-sizing: border-box;
+        display: block;
+      }
+
+      noscript {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(15, 23, 42, 0.95);
+        z-index: 9999;
+      }
+
+      noscript p {
+        max-width: 420px;
+        padding: 18px 20px;
+        border-radius: 16px;
+        background: #020617;
+        border: 1px solid #ef4444;
+        color: #fecaca;
+        font-size: 12px;
+      }
+
+      a[download] {
+        position: absolute;
+        left: -9999px;
+        opacity: 0;
+        pointer-events: none;
+      }
+    </style>
+  </head>
+
+  <body>
+    <noscript>
+      <p>
+        This site doesn't work without JavaScript enabled. Please enable
+        JavaScript and reload the page.
+      </p>
+    </noscript>
+
+    <div class="shell">
+      <div class="chrome">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="title-bar">rdd – roblox deployment downloader</div>
+      </div>
+
+      <div class="content">
+        <div class="left">
+          <div class="heading">
+            <div class="heading-main">
+              <h1>RDD</h1>
+              <span
+                >Unofficial fork – downloads are still fetched directly from
+                Roblox CDN.</span
+              >
+            </div>
+
+            <div class="heading-right">
+              <div class="badge">
+                <span class="badge-dot"></span>
+                <span>Static client-side only</span>
+              </div>
+
+              <div id="statusPill" class="status-pill" data-state="idle">
+                <span class="status-dot"></span>
+                <span id="statusLabel">Idle</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="disclaimer">
+            RDD – "Roblox Deployment Downloader"
+            (<a
+              href="https://github.com/latte-soft/rdd"
+              target="_blank"
+              rel="noreferrer"
+              >GitHub</a
+            >)<br />
+            Copyright (c) 2024-2025 Latte Softworks
+            <a href="https://latte.to" target="_blank" rel="noreferrer"
+              >&lt;latte.to&gt;</a
+            >
+            · MIT License. The only <i>official</i> host is
+            <a href="https://rdd.latte.to" target="_blank" rel="noreferrer"
+              >rdd.latte.to</a
+            >. This is an unofficial rehost.
+          </div>
+
+          <div hidden id="downloadFormDiv">
+            <form id="downloadForm" action="">
+              <div class="field-grid">
+                <div class="field">
+                  <label for="binaryType">Binary Type</label>
+                  <select id="binaryType" name="binaryType">
+                    <option value="WindowsPlayer">WindowsPlayer</option>
+                    <option value="WindowsStudio64">WindowsStudio64</option>
+                    <option value="MacPlayer">MacPlayer</option>
+                    <option value="MacStudio">MacStudio</option>
+                  </select>
+                </div>
+
+                <div class="field">
+                  <label for="channel">Channel Name</label>
+                  <input
+                    id="channel"
+                    name="channel"
+                    type="text"
+                    placeholder="LIVE"
+                  />
+                </div>
+
+                <div class="field">
+                  <label for="version">Version Hash <span>(Optional)</span></label>
+                  <input id="version" name="version" type="text" />
+                </div>
+
+                <div class="field">
+                  <label for="compressionLevel"
+                    >Zip Compression Level (1-9)</label
+                  >
+                  <input
+                    id="compressionLevel"
+                    name="compressionLevel"
+                    type="number"
+                    min="1"
+                    max="9"
+                    value="5"
+                  />
+                </div>
+              </div>
+
+              <div class="field-inline" style="margin-top: 6px">
+                <input
+                  id="compressZip"
+                  name="compressZip"
+                  type="checkbox"
+                />
+                <label for="compressZip" style="margin: 0"
+                  >Compress output zip</label
+                >
+              </div>
+
+              <div class="buttons">
+                <div class="btn-row">
+                  <button
+                    id="downloadButton"
+                    type="button"
+                    class="btn-primary"
+                    onclick="startDownload()"
+                  >
+                    Download deployment
+                  </button>
+                  <button
+                    id="copyLinkButton"
+                    type="button"
+                    class="btn-ghost"
+                    onclick="copyPermLinkUi()"
+                  >
+                    Copy permanent link
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+
+          <div class="log-panel">
+            <div class="log-header">Download log</div>
+            <output id="consoleText"></output>
+          </div>
         </div>
-        <div class="heading-right">
-          <div class="badge">
-            <span class="badge-dot">
-            </span>
-            <span>
-              Static client-side only
-            </span>
-          </div>
-          <div id="statusPill" class="status-pill" data-state="idle">
-            <span class="status-dot">
-            </span>
-            <span id="statusLabel">
-              Idle
-            </span>
+
+        <div class="right">
+          <div class="panel">
+            <h3>Download progress</h3>
+
+            <div class="progress-shell">
+              <div class="progress-track">
+                <div
+                  id="progressBar"
+                  class="progress-bar"
+                  style="width: 0%"
+                ></div>
+              </div>
+            </div>
+
+            <div class="progress-label-row">
+              <span id="progressLabel">Waiting to start…</span>
+              <span id="progressPercent">0%</span>
+            </div>
+
+            <div id="toast" class="toast"></div>
           </div>
         </div>
       </div>
-      <div class="disclaimer">
-        RDD – "Roblox Deployment Downloader" (
-        <a href="https://github.com/latte-soft/rdd" target="_blank" rel="noreferrer">
-          GitHub
-        </a>
-        )
-        <br>
-        Copyright (c) 2024-2025 Latte Softworks
-        <a href="https://latte.to" target="_blank" rel="noreferrer">
-          <latte.to>
-          </latte.to>
-        </a>
-        · MIT License. The only
-        <i>
-          official
-        </i>
-        host is
-        <a href="https://rdd.latte.to" target="_blank" rel="noreferrer">
-          rdd.latte.to
-        </a>
-        . This is an unofficial rehost.
-      </div>
-      <div hidden="" id="downloadFormDiv">
-        <form id="downloadForm" action="">
-          <div class="field-grid">
-            <div class="field">
-              <label for="binaryType">
-                Binary Type
-              </label>
-              <select id="binaryType" name="binaryType">
-                <option value="WindowsPlayer">
-                  WindowsPlayer
-                </option>
-                <option value="WindowsStudio64">
-                  WindowsStudio64
-                </option>
-                <option value="MacPlayer">
-                  MacPlayer
-                </option>
-                <option value="MacStudio">
-                  MacStudio
-                </option>
-              </select>
-            </div>
-            <div class="field">
-              <label for="channel">
-                Channel Name
-              </label>
-              <input id="channel" name="channel" type="text" placeholder="LIVE">
-            </div>
-            <div class="field">
-              <label for="version">
-                Version Hash
-                <span>
-                  (Optional)
-                </span>
-              </label>
-              <input id="version" name="version" type="text">
-            </div>
-            <div class="field">
-              <label for="compressionLevel">
-                Zip Compression Level (1-9)
-              </label>
-              <input id="compressionLevel" name="compressionLevel" type="number" min="1" max="9" value="5">
-            </div>
-          </div>
-          <div class="field-inline" style="margin-top: 6px">
-            <input id="compressZip" name="compressZip" type="checkbox">
-            <label for="compressZip" style="margin: 0">
-              Compress output zip
-            </label>
-          </div>
-          <div class="buttons">
-            <div class="btn-row">
-              <button id="downloadButton" type="button" class="btn-primary" onclick="startDownload()">
-                Download deployment
-              </button>
-              <button id="copyLinkButton" type="button" class="btn-ghost" onclick="copyPermLinkUi()">
-                Copy permanent link
-              </button>
-            </div>
-          </div>
-        </form>
-      </div>
     </div>
-    <div class="log-panel">
-      <div class="log-header">
-        Download log
-      </div>
-      <output id="consoleText">
-      </output>
-    </div>
-  </div>
-  <div class="right">
-    <div class="panel">
-      <h3>
-        Download progress
-      </h3>
-      <div class="progress-shell">
-        <div class="progress-track">
-          <div id="progressBar" class="progress-bar" style="width: 0%">
-          </div>
-        </div>
-      </div>
-      <div class="progress-label-row">
-        <span id="progressLabel">
-          Waiting to start…
-        </span>
-        <span id="progressPercent">
-          0%
-        </span>
-      </div>
-      <div id="toast" class="toast">
-      </div>
-    </div>
-    <output id="consoleText">
-    </output>
-  </div>
-</div>
-<script src="js/jszip.min.js">
-</script>
-<script src="js/rdd.js">
-</script>
-<script>
-  const progressBar = document.getElementById("progressBar");
-  const progressLabel = document.getElementById("progressLabel");
-  const progressPercent = document.getElementById("progressPercent");
-  const statusPill = document.getElementById("statusPill");
-  const statusLabel = document.getElementById("statusLabel");
-  const toast = document.getElementById("toast");
-  const formDiv = document.getElementById("downloadFormDiv");
-  const consoleText = document.getElementById("consoleText");
-  let progressTimer = null;
-  let progressValue = 0;
-  let progressRunning = false;
-  let autoScrollLog = true;
-  function setStatus(state, text) {
-  statusPill.dataset.state = state;
-  statusLabel.textContent = text;
-  }
-  function setProgress(target, label) {
-  const clamped = Math.max(0, Math.min(100, target));
-  progressValue = clamped;
-  progressBar.style.width = clamped + "%";
-  if (label) {
-  progressLabel.textContent = label;
-  }
-  progressPercent.textContent = clamped.toFixed(0) + "%";
-  }
-  function showToast(text) {
-  toast.textContent = text;
-  toast.classList.add("show");
-  setTimeout(() => toast.classList.remove("show"), 2600);
-  }
-  function startProgressLoop() {
-  clearInterval(progressTimer);
-  progressRunning = true;
-  let t = 0;
-  progressTimer = setInterval(() => {
-  if (!progressRunning) {
-  clearInterval(progressTimer);
-  return;
-  }
-  t += 1;
-  const max = 90;
-  const eased = max - max * Math.exp(-t / 24);
-  if (progressValue < eased) {
-  setProgress(eased, "Downloading & assembling deployment…");
-  }
-  }, 350);
-  }
-  function finishProgress(ok) {
-  progressRunning = false;
-  clearInterval(progressTimer);
-  setProgress(100, ok ? "Download ready" : "Download failed");
-  setStatus(ok ? "done" : "error", ok ? "Completed" : "Failed");
-  if (ok) {
-  showToast("Download finished – your browser should start saving.");
-  } else {
-  showToast("Download failed. Check devtools console for details.");
-  }
-  }
-  function startDownload() {
-  if (typeof downloadFromForm !== "function") {
-  alert("rdd.js failed to load.");
-  return;
-  }
-  setProgress(0, "Preparing request…");
-  setStatus("running", "Downloading");
-  progressRunning = true;
-  startProgressLoop();
-  try {
-  downloadFromForm();
-  } catch (err) {
-  console.error(err);
-  finishProgress(false);
-  }
-  }
-  function copyPermLinkUi() {
-  if (typeof copyPermLink === "function") {
-  try {
-  copyPermLink();
-  showToast("Permanent link copied to clipboard.");
-  } catch (err) {
-  console.error(err);
-  showToast("Failed to copy link.");
-  }
-  } else if (navigator.clipboard) {
-  const url = window.location.href;
-  navigator.clipboard
-  .writeText(url)
-  .then(() => showToast("Link copied to clipboard."))
-  .catch(() => showToast("Failed to copy link."));
-  } else {
-  showToast("Clipboard not available.");
-  }
-  }
-  (function patchCreateObjectURL() {
-  const orig = URL.createObjectURL;
-  URL.createObjectURL = function (blob) {
-  if (progressRunning) {
-  finishProgress(true);
-  }
-  return orig.apply(this, arguments);
-  };
-  })();
-  window.addEventListener("error", function () {
-  if (progressRunning) {
-  finishProgress(false);
-  }
-  });
-  document.addEventListener("DOMContentLoaded", function () {
-  const url = new URL(window.location.href);
-  const hasQuery = url.search && url.search.length > 1;
-  if (!hasQuery) {
-  formDiv.hidden = false;
-  setStatus("idle", "Idle");
-  setProgress(0, "Waiting to start…");
-  } else {
-  formDiv.hidden = false;
-  setStatus("running", "Downloading");
-  setProgress(0, "Preparing request…");
-  startProgressLoop();
-  }
-  if (consoleText) {
-  consoleText.addEventListener("scroll", function () {
-  const threshold = 10;
-  const distanceFromBottom =
-  consoleText.scrollHeight -
-  consoleText.clientHeight -
-  consoleText.scrollTop;
-  autoScrollLog = distanceFromBottom <= threshold;
-  });
-  const observer = new MutationObserver(function () {
-  if (autoScrollLog) {
-  consoleText.scrollTop = consoleText.scrollHeight;
-  }
-  });
-  observer.observe(consoleText, {
-  childList: true,
-  characterData: true,
-  subtree: true,
-  });
-  }
-  });
-</script>
+
+    <script src="js/jszip.min.js"></script>
+    <script src="js/rdd.js"></script>
+
+    <script>
+      const progressBar = document.getElementById("progressBar");
+      const progressLabel = document.getElementById("progressLabel");
+      const progressPercent = document.getElementById("progressPercent");
+      const statusPill = document.getElementById("statusPill");
+      const statusLabel = document.getElementById("statusLabel");
+      const toast = document.getElementById("toast");
+      const formDiv = document.getElementById("downloadFormDiv");
+      const consoleText = document.getElementById("consoleText");
+
+      let progressTimer = null;
+      let progressValue = 0;
+      let progressRunning = false;
+      let autoScrollLog = true;
+
+      function setStatus(state, text) {
+        statusPill.dataset.state = state;
+        statusLabel.textContent = text;
+      }
+
+      function setProgress(target, label) {
+        const clamped = Math.max(0, Math.min(100, target));
+        progressValue = clamped;
+        progressBar.style.width = clamped + "%";
+        if (label) {
+          progressLabel.textContent = label;
+        }
+        progressPercent.textContent = clamped.toFixed(0) + "%";
+      }
+
+      function showToast(text) {
+        toast.textContent = text;
+        toast.classList.add("show");
+        setTimeout(() => toast.classList.remove("show"), 2600);
+      }
+
+      function startProgressLoop() {
+        clearInterval(progressTimer);
+        progressRunning = true;
+        let t = 0;
+        progressTimer = setInterval(() => {
+          if (!progressRunning) {
+            clearInterval(progressTimer);
+            return;
+          }
+          t += 1;
+          const max = 90;
+          const eased = max - max * Math.exp(-t / 24);
+          if (progressValue < eased) {
+            setProgress(eased, "Downloading & assembling deployment…");
+          }
+        }, 350);
+      }
+
+      function finishProgress(ok) {
+        progressRunning = false;
+        clearInterval(progressTimer);
+        setProgress(100, ok ? "Download ready" : "Download failed");
+        setStatus(ok ? "done" : "error", ok ? "Completed" : "Failed");
+        if (ok) {
+          showToast("Download finished – your browser should start saving.");
+        } else {
+          showToast("Download failed. Check devtools console for details.");
+        }
+      }
+
+      function startDownload() {
+        if (typeof downloadFromForm !== "function") {
+          alert("rdd.js failed to load.");
+          return;
+        }
+
+        setProgress(0, "Preparing request…");
+        setStatus("running", "Downloading");
+        progressRunning = true;
+        startProgressLoop();
+
+        try {
+          downloadFromForm();
+        } catch (err) {
+          console.error(err);
+          finishProgress(false);
+        }
+      }
+
+      function copyPermLinkUi() {
+        if (typeof copyPermLink === "function") {
+          try {
+            copyPermLink();
+            showToast("Permanent link copied to clipboard.");
+          } catch (err) {
+            console.error(err);
+            showToast("Failed to copy link.");
+          }
+        } else if (navigator.clipboard) {
+          const url = window.location.href;
+          navigator.clipboard
+            .writeText(url)
+            .then(() => showToast("Link copied to clipboard."))
+            .catch(() => showToast("Failed to copy link."));
+        } else {
+          showToast("Clipboard not available.");
+        }
+      }
+
+      (function patchCreateObjectURL() {
+        const orig = URL.createObjectURL;
+        URL.createObjectURL = function (blob) {
+          if (progressRunning) {
+            finishProgress(true);
+          }
+          return orig.apply(this, arguments);
+        };
+      })();
+
+      window.addEventListener("error", function () {
+        if (progressRunning) {
+          finishProgress(false);
+        }
+      });
+
+      document.addEventListener("DOMContentLoaded", function () {
+        const url = new URL(window.location.href);
+        const hasQuery = url.search && url.search.length > 1;
+
+        if (!hasQuery) {
+          formDiv.hidden = false;
+          setStatus("idle", "Idle");
+          setProgress(0, "Waiting to start…");
+        } else {
+          formDiv.hidden = false;
+          setStatus("running", "Downloading");
+          setProgress(0, "Preparing request…");
+          startProgressLoop();
+        }
+
+        if (consoleText) {
+          consoleText.addEventListener("scroll", function () {
+            const threshold = 10;
+            const distanceFromBottom =
+              consoleText.scrollHeight -
+              consoleText.clientHeight -
+              consoleText.scrollTop;
+            autoScrollLog = distanceFromBottom <= threshold;
+          });
+
+          const observer = new MutationObserver(function () {
+            if (autoScrollLog) {
+              consoleText.scrollTop = consoleText.scrollHeight;
+            }
+          });
+
+          observer.observe(consoleText, {
+            childList: true,
+            characterData: true,
+            subtree: true,
+          });
+        }
+      });
+    </script>
+  </body>
+</html>
