@@ -649,35 +649,36 @@
 
         <script src="js/jszip.min.js"></script>
     <script src="js/rdd.js"></script>
-
     <script>
       (function () {
-        const progressBar = document.getElementById("progressBar");
-        const progressLabel = document.getElementById("progressLabel");
-        const progressPercent = document.getElementById("progressPercent");
-        const statusPill = document.getElementById("statusPill");
-        const statusLabel = document.getElementById("statusLabel");
-        const toast = document.getElementById("toast");
-        const formDiv = document.getElementById("downloadFormDiv");
-        const consoleText = document.getElementById("consoleText");
+        var statusPill = document.getElementById("statusPill");
+        var statusLabel = document.getElementById("statusLabel");
+        var progressBar = document.getElementById("progressBar");
+        var progressLabel = document.getElementById("progressLabel");
+        var progressPercent = document.getElementById("progressPercent");
+        var toast = document.getElementById("toast");
+        var consoleText = document.getElementById("consoleText");
+        var formDiv = document.getElementById("downloadFormDiv");
 
-        let progressTimer = null;
-        let progressValue = 0;
-        let progressRunning = false;
-        let autoScrollLog = true;
+        if (!statusPill || !progressBar) return;
+
+        var progressValue = 0;
+        var progressTimer = null;
+        var progressRunning = false;
+        var autoScrollLog = true;
 
         function setStatus(state, text) {
-          if (!statusPill || !statusLabel) return;
           statusPill.dataset.state = state;
-          statusLabel.textContent = text;
+          if (statusLabel) statusLabel.textContent = text;
         }
 
         function setProgress(target, label) {
-          if (!progressBar) return;
-          const clamped = Math.max(0, Math.min(100, target));
+          var clamped = Math.max(0, Math.min(100, target));
           progressValue = clamped;
           progressBar.style.width = clamped + "%";
-          if (label && progressLabel) progressLabel.textContent = label;
+          if (label && progressLabel) {
+            progressLabel.textContent = label;
+          }
           if (progressPercent) {
             progressPercent.textContent = clamped.toFixed(0) + "%";
           }
@@ -687,24 +688,27 @@
           if (!toast) return;
           toast.textContent = text;
           toast.classList.add("show");
-          setTimeout(function () {
+          window.setTimeout(function () {
             toast.classList.remove("show");
           }, 2600);
         }
 
         function startProgressLoop() {
-          if (!progressBar) return;
-          clearInterval(progressTimer);
+          if (progressTimer) {
+            window.clearInterval(progressTimer);
+            progressTimer = null;
+          }
           progressRunning = true;
-          let t = 0;
-          progressTimer = setInterval(function () {
+          var t = 0;
+          progressTimer = window.setInterval(function () {
             if (!progressRunning) {
-              clearInterval(progressTimer);
+              window.clearInterval(progressTimer);
+              progressTimer = null;
               return;
             }
             t += 1;
-            const max = 90;
-            const eased = max - max * Math.exp(-t / 24);
+            var max = 90;
+            var eased = max - max * Math.exp(-t / 24);
             if (progressValue < eased) {
               setProgress(eased, "Downloading & assembling deployment…");
             }
@@ -712,8 +716,12 @@
         }
 
         function finishProgress(ok) {
+          if (!progressRunning) return;
           progressRunning = false;
-          clearInterval(progressTimer);
+          if (progressTimer) {
+            window.clearInterval(progressTimer);
+            progressTimer = null;
+          }
           setProgress(100, ok ? "Download ready" : "Download failed");
           setStatus(ok ? "done" : "error", ok ? "Completed" : "Failed");
           if (ok) {
@@ -723,15 +731,39 @@
           }
         }
 
-        // When rdd.js finishes building the zip, it calls URL.createObjectURL(blob).
-        // We hook that to know the download is ready.
-        if (window.URL && URL.createObjectURL) {
-          const origCreateObjectURL = URL.createObjectURL;
+        if (formDiv) {
+          formDiv.hidden = false;
+        }
+
+        if (consoleText) {
+          consoleText.addEventListener("scroll", function () {
+            var distance =
+              consoleText.scrollHeight -
+              consoleText.clientHeight -
+              consoleText.scrollTop;
+            autoScrollLog = distance <= 10;
+          });
+
+          var observer = new MutationObserver(function () {
+            if (autoScrollLog) {
+              consoleText.scrollTop = consoleText.scrollHeight;
+            }
+          });
+
+          observer.observe(consoleText, {
+            childList: true,
+            characterData: true,
+            subtree: true,
+          });
+        }
+
+        if (typeof URL !== "undefined" && typeof URL.createObjectURL === "function") {
+          var origCreate = URL.createObjectURL;
           URL.createObjectURL = function () {
             if (progressRunning) {
               finishProgress(true);
             }
-            return origCreateObjectURL.apply(this, arguments);
+            return origCreate.apply(this, arguments);
           };
         }
 
@@ -741,49 +773,39 @@
           }
         });
 
-        document.addEventListener("DOMContentLoaded", function () {
-          if (formDiv) {
-            formDiv.hidden = false; // always show the form
-          }
-
-          const hasQuery = window.location.search.length > 1;
-
-          // Normal entry: no ?channel=... -> idle
-          if (!hasQuery) {
-            setStatus("idle", "Idle");
-            setProgress(0, "Waiting to start…");
-          } else {
-            // When the page is opened via a permanent link (?channel=LIVE&binaryType=...)
-            // rdd.js will start downloading; we show running state + progress loop.
+        if (typeof window.downloadFromForm === "function") {
+          var origDownloadFromForm = window.downloadFromForm;
+          window.downloadFromForm = function () {
             setStatus("running", "Downloading");
             setProgress(0, "Preparing request…");
             startProgressLoop();
-          }
+            return origDownloadFromForm.apply(this, arguments);
+          };
+        }
 
-          // Auto-scroll the log while you're at the bottom
-          if (consoleText) {
-            consoleText.addEventListener("scroll", function () {
-              const threshold = 10;
-              const distanceFromBottom =
-                consoleText.scrollHeight -
-                consoleText.clientHeight -
-                consoleText.scrollTop;
-              autoScrollLog = distanceFromBottom <= threshold;
-            });
+        if (typeof window.copyPermLink === "function") {
+          var origCopyPermLink = window.copyPermLink;
+          window.copyPermLink = function () {
+            try {
+              var res = origCopyPermLink.apply(this, arguments);
+              showToast("Permanent link copied to clipboard.");
+              return res;
+            } catch (e) {
+              if (window.console && console.error) console.error(e);
+              showToast("Failed to copy link.");
+            }
+          };
+        }
 
-            const observer = new MutationObserver(function () {
-              if (autoScrollLog) {
-                consoleText.scrollTop = consoleText.scrollHeight;
-              }
-            });
-
-            observer.observe(consoleText, {
-              childList: true,
-              characterData: true,
-              subtree: true,
-            });
-          }
-        });
+        var hasQuery = window.location.search && window.location.search.length > 1;
+        if (hasQuery) {
+          setStatus("running", "Downloading");
+          setProgress(0, "Preparing request…");
+          startProgressLoop();
+        } else {
+          setStatus("idle", "Idle");
+          setProgress(0, "Waiting to start…");
+        }
       })();
     </script>
   </body>
