@@ -410,13 +410,33 @@
         transform: translateY(0);
       }
 
+      .log-panel {
+        margin-top: 12px;
+        border-radius: 16px;
+        border: 1px solid var(--border);
+        background: radial-gradient(circle at top left, #020617 0, #020617 55%);
+        padding: 10px 10px 8px 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .log-header {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: var(--text-soft);
+      }
+
       #consoleText {
-        display: none;
-        font-size: 10px;
+        font-size: 11px;
+        background: rgba(15, 23, 42, 0.95);
+        border-radius: 12px;
+        border: 1px solid rgba(31, 41, 55, 1);
+        padding: 8px 9px;
         white-space: pre-wrap;
-        max-height: 160px;
-        overflow: auto;
-        opacity: 0.4;
+        max-height: 180px;
+        overflow-y: auto;
       }
 
       noscript {
@@ -582,6 +602,12 @@
                 </div>
               </div>
             </form>
+          </div>
+        </div>
+
+        <div class="log-panel">
+            <div class="log-header">Download log</div>
+            <output id="consoleText"></output>
           </div>
         </div>
 
