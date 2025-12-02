@@ -385,6 +385,9 @@
   white-space: pre-wrap;
   max-height: 150px;
   overflow-y: auto;
+  width: 100%;
+  box-sizing: border-box;
+  display: block;
   }
   noscript {
   position: fixed;
@@ -466,6 +469,7 @@
         Copyright (c) 2024-2025 Latte Softworks
         <a href="https://latte.to" target="_blank" rel="noreferrer">
           <latte.to>
+          </latte.to>
         </a>
         · MIT License. The only
         <i>
@@ -586,9 +590,11 @@
   const statusLabel = document.getElementById("statusLabel");
   const toast = document.getElementById("toast");
   const formDiv = document.getElementById("downloadFormDiv");
+  const consoleText = document.getElementById("consoleText");
   let progressTimer = null;
   let progressValue = 0;
   let progressRunning = false;
+  let autoScrollLog = true;
   function setStatus(state, text) {
   statusPill.dataset.state = state;
   statusLabel.textContent = text;
@@ -696,6 +702,26 @@
   setStatus("running", "Downloading");
   setProgress(0, "Preparing request…");
   startProgressLoop();
+  }
+  if (consoleText) {
+  consoleText.addEventListener("scroll", function () {
+  const threshold = 10;
+  const distanceFromBottom =
+  consoleText.scrollHeight -
+  consoleText.clientHeight -
+  consoleText.scrollTop;
+  autoScrollLog = distanceFromBottom <= threshold;
+  });
+  const observer = new MutationObserver(function () {
+  if (autoScrollLog) {
+  consoleText.scrollTop = consoleText.scrollHeight;
+  }
+  });
+  observer.observe(consoleText, {
+  childList: true,
+  characterData: true,
+  subtree: true,
+  });
   }
   });
 </script>
