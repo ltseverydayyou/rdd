@@ -499,7 +499,7 @@
           </div>
 
           <div hidden id="downloadFormDiv">
-            <form id="downloadForm" target="_blank" action="">
+            <form id="downloadForm" action="">
               <div class="field-grid">
                 <div class="field">
                   <label for="binaryType">Binary Type</label>
@@ -736,7 +736,12 @@
 
       document.addEventListener("DOMContentLoaded", function () {
         formDiv.hidden = false;
-      });
+        
+        var f = document.getElementById("downloadForm");
+        if (f) {
+            f.removeAttribute("target");
+            }
+        });
     </script>
   </body>
 </html>
