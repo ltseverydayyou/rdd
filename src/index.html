@@ -5,7 +5,6 @@
     <title>RDD – Roblox Deployment Downloader</title>
     <link rel="icon" href="favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-
     <style>
       @import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap");
 
@@ -34,8 +33,8 @@
       body {
         margin: 0;
         min-height: 100vh;
-        font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo,
-          Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco,
+          Consolas, "Liberation Mono", "Courier New", monospace;
         background: radial-gradient(circle at top, #0f172a 0, #020617 45%);
         color: var(--text);
         display: flex;
@@ -52,7 +51,7 @@
         border-radius: 24px;
         border: 1px solid rgba(148, 163, 184, 0.25);
         box-shadow: var(--shadow-soft);
-        overflow: visible;
+        overflow: hidden;
         position: relative;
       }
 
@@ -106,7 +105,7 @@
       .content {
         position: relative;
         z-index: 1;
-        padding: 22px 22px 20px 22px;
+        padding: 22px;
         display: grid;
         grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
         gap: 24px;
@@ -151,9 +150,9 @@
 
       .heading-right {
         display: flex;
-        flex-direction: row;
-        align-items: center;
+        flex-direction: column;
         gap: 8px;
+        align-items: flex-end;
       }
 
       .badge {
@@ -269,7 +268,7 @@
         display: flex;
         justify-content: flex-start;
         align-items: center;
-        gap: 8px;
+        gap: 12px;
         margin-top: 6px;
       }
 
@@ -354,7 +353,7 @@
       .right {
         display: flex;
         flex-direction: column;
-        gap: 12px;
+        gap: 14px;
       }
 
       .panel {
@@ -414,6 +413,7 @@
         opacity: 0;
         transform: translateY(4px);
         transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+        margin-top: 6px;
       }
 
       .toast.show {
@@ -422,11 +422,10 @@
       }
 
       .log-panel {
-        margin-top: 20px;
         border-radius: 16px;
         border: 1px solid var(--border);
         background: radial-gradient(circle at top left, #020617 0, #020617 55%);
-        padding: 10px 10px 8px 10px;
+        padding: 10px;
         display: flex;
         flex-direction: column;
         gap: 6px;
@@ -502,22 +501,21 @@
       </div>
 
       <div class="content">
+        <!-- LEFT COLUMN -->
         <div class="left">
           <div class="heading">
             <div class="heading-main">
               <h1>RDD</h1>
-              <span
-                >Unofficial fork – downloads are still fetched directly from
-                Roblox CDN.</span
-              >
+              <span>
+                Unofficial fork – downloads are still fetched directly from Roblox
+                CDN.
+              </span>
             </div>
-
             <div class="heading-right">
               <div class="badge">
                 <span class="badge-dot"></span>
                 <span>Static client-side only</span>
               </div>
-
               <div id="statusPill" class="status-pill" data-state="idle">
                 <span class="status-dot"></span>
                 <span id="statusLabel">Idle</span>
@@ -526,23 +524,29 @@
           </div>
 
           <div class="disclaimer">
-            RDD – "Roblox Deployment Downloader"
-            (<a
+            RDD – "Roblox Deployment Downloader" (
+            <a
               href="https://github.com/latte-soft/rdd"
               target="_blank"
               rel="noreferrer"
-              >GitHub</a
-            >)<br />
-            Copyright (c) 2024-2025 Latte Softworks
-            <a href="https://latte.to" target="_blank" rel="noreferrer"
-              >&lt;latte.to&gt;</a
             >
-            · MIT License. The only <i>official</i> host is
-            <a href="https://rdd.latte.to" target="_blank" rel="noreferrer"
-              >rdd.latte.to</a
-            >. This is an unofficial rehost.
+              GitHub
+            </a>
+            )<br />
+            Copyright (c) 2024-2025 Latte Softworks
+            <a href="https://latte.to" target="_blank" rel="noreferrer">
+              &lt;latte.to&gt;
+            </a>
+            · MIT License. The only
+            <i>official</i>
+            host is
+            <a href="https://rdd.latte.to" target="_blank" rel="noreferrer">
+              rdd.latte.to
+            </a>
+            . This is an unofficial rehost.
           </div>
 
+          <!-- RDD FORM (keeps original IDs so rdd.js still works) -->
           <div hidden id="downloadFormDiv">
             <form id="downloadForm" action="">
               <div class="field-grid">
@@ -567,14 +571,16 @@
                 </div>
 
                 <div class="field">
-                  <label for="version">Version Hash <span>(Optional)</span></label>
+                  <label for="version">
+                    Version Hash <span>(Optional)</span>
+                  </label>
                   <input id="version" name="version" type="text" />
                 </div>
 
                 <div class="field">
-                  <label for="compressionLevel"
-                    >Zip Compression Level (1-9)</label
-                  >
+                  <label for="compressionLevel">
+                    Zip Compression Level (1-9)
+                  </label>
                   <input
                     id="compressionLevel"
                     name="compressionLevel"
@@ -587,14 +593,10 @@
               </div>
 
               <div class="field-inline" style="margin-top: 6px">
-                <input
-                  id="compressZip"
-                  name="compressZip"
-                  type="checkbox"
-                />
-                <label for="compressZip" style="margin: 0"
-                  >Compress output zip</label
-                >
+                <input id="compressZip" name="compressZip" type="checkbox" />
+                <label for="compressZip" style="margin: 0">
+                  Compress output zip
+                </label>
               </div>
 
               <div class="buttons">
@@ -619,33 +621,27 @@
               </div>
             </form>
           </div>
-
-          <div class="log-panel">
-            <div class="log-header">Download log</div>
-            <output id="consoleText"></output>
-          </div>
         </div>
 
+        <!-- RIGHT COLUMN -->
         <div class="right">
           <div class="panel">
             <h3>Download progress</h3>
-
             <div class="progress-shell">
               <div class="progress-track">
-                <div
-                  id="progressBar"
-                  class="progress-bar"
-                  style="width: 0%"
-                ></div>
+                <div id="progressBar" class="progress-bar" style="width: 0%"></div>
               </div>
             </div>
-
             <div class="progress-label-row">
               <span id="progressLabel">Waiting to start…</span>
               <span id="progressPercent">0%</span>
             </div>
-
             <div id="toast" class="toast"></div>
+          </div>
+
+          <div class="log-panel">
+            <div class="log-header">Download log</div>
+            <output id="consoleText"></output>
           </div>
         </div>
       </div>
@@ -725,14 +721,12 @@
           alert("rdd.js failed to load.");
           return;
         }
-
         setProgress(0, "Preparing request…");
         setStatus("running", "Downloading");
         progressRunning = true;
         startProgressLoop();
-
         try {
-          downloadFromForm();
+          downloadFromForm(); // uses ?channel=...&binaryType=...&version=... exactly like original
         } catch (err) {
           console.error(err);
           finishProgress(false);
@@ -742,7 +736,7 @@
       function copyPermLinkUi() {
         if (typeof copyPermLink === "function") {
           try {
-            copyPermLink();
+            copyPermLink(); // original rdd.js builds ?channel=...&binaryType=... link
             showToast("Permanent link copied to clipboard.");
           } catch (err) {
             console.error(err);
@@ -759,6 +753,7 @@
         }
       }
 
+      // Hook createObjectURL so we can finish the progress bar when the zip is ready
       (function patchCreateObjectURL() {
         const orig = URL.createObjectURL;
         URL.createObjectURL = function (blob) {
