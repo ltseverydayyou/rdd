@@ -1,419 +1,544 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
   <head>
     <meta charset="utf-8" />
-    <title>RDD – Roblox Deployment Downloader</title>
+    <title>RDD - Roblox Deployment Downloader</title>
     <link rel="icon" href="favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style>
-      @import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap");
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap");
 
       :root {
         color-scheme: dark;
-        --bg: #020617;
-        --bg-elevated: #020617;
-        --bg-elevated-soft: #020617;
-        --border: #1f2937;
-        --accent: #38bdf8;
-        --accent-soft: rgba(56, 189, 248, 0.15);
-        --accent-strong: #0ea5e9;
-        --text: #e5e7eb;
-        --text-soft: #9ca3af;
-        --danger: #f97373;
-        --success: #4ade80;
-        --radius-lg: 16px;
+        --bg: #0f0f14;
+        --bg-secondary: #16161e;
+        --bg-tertiary: #1e1e28;
+        --bg-quaternary: #2a2a35;
+        --surface: rgba(22, 22, 30, 0.88);
+        --surface-strong: rgba(18, 18, 26, 0.96);
+        --surface-soft: rgba(255, 255, 255, 0.03);
+        --border: rgba(255, 255, 255, 0.08);
+        --border-strong: rgba(255, 255, 255, 0.12);
+        --text: #ebebf5;
+        --text-secondary: #c8c8d2;
+        --text-tertiary: #a0a0aa;
+        --accent: #7dd3fc;
+        --accent-strong: #38bdf8;
+        --accent-soft: rgba(56, 189, 248, 0.14);
+        --success: #22c55e;
+        --danger: #ef4444;
+        --shadow: 0 28px 80px rgba(0, 0, 0, 0.42);
+        --radius-xl: 28px;
+        --radius-lg: 20px;
+        --radius-md: 16px;
+        --radius-sm: 12px;
         --radius-pill: 999px;
-        --shadow-soft: 0 24px 60px rgba(0, 0, 0, 0.6);
       }
 
       * {
         box-sizing: border-box;
       }
 
+      html,
+      body {
+        min-width: 320px;
+        min-height: 100%;
+      }
+
       body {
         margin: 0;
-        min-height: 100vh;
-        font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco,
-          Consolas, "Liberation Mono", "Courier New", monospace;
-        background: radial-gradient(circle at top, #0f172a 0, #020617 45%);
+        font-family: "Inter", system-ui, sans-serif;
+        background: var(--bg);
         color: var(--text);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 24px;
-      }
-
-      .shell {
-        width: 100%;
-        max-width: 880px;
-        background: radial-gradient(circle at top left, #020617 0, #020617 55%)
-          padding-box;
-        border-radius: 24px;
-        border: 1px solid rgba(148, 163, 184, 0.25);
-        box-shadow: var(--shadow-soft);
-        overflow: hidden;
         position: relative;
+        overflow-x: hidden;
       }
 
-      .shell::before {
+      body::before {
         content: "";
-        position: absolute;
+        position: fixed;
         inset: 0;
-        background: radial-gradient(
-          circle at top,
-          rgba(56, 189, 248, 0.16),
-          transparent 55%
-        );
-        opacity: 0.75;
+        background-image:
+          linear-gradient(to right, rgba(30, 30, 40, 0.85) 1px, transparent 1px),
+          linear-gradient(to bottom, rgba(30, 30, 40, 0.85) 1px, transparent 1px);
+        background-size: 160px 160px;
+        opacity: 0.85;
         pointer-events: none;
+        z-index: -4;
       }
 
-      .chrome {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        padding: 10px 16px;
-        border-bottom: 1px solid rgba(15, 23, 42, 0.9);
-        background: linear-gradient(90deg, #020617, #020617);
-        position: relative;
-        z-index: 1;
+      body::after {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background:
+          radial-gradient(circle at top, rgba(125, 211, 252, 0.12), transparent 38%),
+          linear-gradient(to bottom, rgba(15, 15, 20, 0), rgba(15, 15, 20, 0.92) 90%),
+          linear-gradient(to right, rgba(15, 15, 20, 0.82), transparent 16%, transparent 84%, rgba(15, 15, 20, 0.82));
+        pointer-events: none;
+        z-index: -3;
       }
 
-      .dot {
-        width: 10px;
-        height: 10px;
-        border-radius: 999px;
-        background: #f97373;
-      }
-
-      .dot:nth-child(2) {
-        background: #facc15;
-      }
-
-      .dot:nth-child(3) {
-        background: #22c55e;
-      }
-
-      .title-bar {
-        flex: 1;
-        display: flex;
-        justify-content: center;
-        font-size: 12px;
-        color: var(--text-soft);
-      }
-
-      .content {
-        position: relative;
-        z-index: 1;
-        padding: 22px;
-        display: grid;
-        grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
-        gap: 24px;
-      }
-
-      @media (max-width: 840px) {
-        .content {
-          grid-template-columns: minmax(0, 1fr);
-        }
-      }
-
-      .left {
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-      }
-
-      .heading {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        gap: 12px;
-      }
-
-      .heading-main {
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-      }
-
-      .heading-main h1 {
-        margin: 0;
-        font-size: 18px;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-      }
-
-      .heading-main span {
-        font-size: 12px;
-        color: var(--text-soft);
-      }
-
-      .heading-right {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        align-items: flex-end;
-      }
-
-      .badge {
-        padding: 4px 10px;
-        border-radius: var(--radius-pill);
-        border: 1px solid rgba(148, 163, 184, 0.6);
-        font-size: 11px;
-        color: var(--text-soft);
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        background: rgba(15, 23, 42, 0.9);
-      }
-
-      .badge-dot {
-        width: 6px;
-        height: 6px;
-        border-radius: 999px;
-        background: var(--success);
-        box-shadow: 0 0 12px rgba(74, 222, 128, 0.8);
-      }
-
-      .disclaimer {
-        font-size: 11px;
-        color: var(--text-soft);
-        line-height: 1.4;
-        padding: 10px 12px;
-        border-radius: 12px;
-        border: 1px solid rgba(30, 64, 175, 0.7);
-        background: rgba(15, 23, 42, 0.9);
-      }
-
-      .disclaimer a {
-        color: var(--accent);
+      a {
+        color: inherit;
         text-decoration: none;
       }
 
-      .disclaimer a:hover {
-        text-decoration: underline;
+      button,
+      input,
+      select {
+        font: inherit;
+      }
+
+      .page {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 28px 16px;
+      }
+
+      .app-shell {
+        width: min(1120px, 100%);
+        border-radius: var(--radius-xl);
+        border: 1px solid var(--border);
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01)),
+          rgba(10, 10, 15, 0.9);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        position: relative;
+        backdrop-filter: blur(20px);
+      }
+
+      .app-shell::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+          radial-gradient(circle at top left, rgba(125, 211, 252, 0.1), transparent 28%),
+          radial-gradient(circle at bottom right, rgba(96, 165, 250, 0.08), transparent 28%);
+        pointer-events: none;
+      }
+
+      .hero {
+        position: relative;
+        z-index: 1;
+        padding: 28px 28px 22px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 24px;
+      }
+
+      .hero-copy {
+        max-width: 680px;
+      }
+
+      .hero-badge-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 16px;
+      }
+
+      .hero-badge,
+      .status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        min-height: 34px;
+        padding: 0 12px;
+        border-radius: var(--radius-pill);
+        border: 1px solid var(--border-strong);
+        background: rgba(255, 255, 255, 0.035);
+        color: var(--text-secondary);
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+      }
+
+      .hero-badge strong {
+        color: var(--text);
+      }
+
+      .hero-badge__dot,
+      .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--text-tertiary);
+        flex: none;
+      }
+
+      .hero-badge__dot {
+        background: var(--success);
+        box-shadow: 0 0 14px rgba(34, 197, 94, 0.65);
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(2.25rem, 4vw, 3.6rem);
+        line-height: 0.96;
+        letter-spacing: -0.05em;
+        font-weight: 800;
+      }
+
+      .hero-copy p {
+        margin: 16px 0 0;
+        max-width: 60ch;
+        color: var(--text-tertiary);
+        font-size: 15px;
+        line-height: 1.7;
+      }
+
+      .hero-side {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 12px;
+        min-width: 220px;
+      }
+
+      .status-pill {
+        background: rgba(255, 255, 255, 0.04);
+      }
+
+      .status-pill[data-state="running"] .status-dot {
+        background: var(--accent-strong);
+        box-shadow: 0 0 14px rgba(56, 189, 248, 0.75);
+      }
+
+      .status-pill[data-state="done"] .status-dot {
+        background: var(--success);
+        box-shadow: 0 0 14px rgba(34, 197, 94, 0.75);
+      }
+
+      .status-pill[data-state="error"] .status-dot {
+        background: var(--danger);
+        box-shadow: 0 0 14px rgba(239, 68, 68, 0.75);
+      }
+
+      .hero-note {
+        max-width: 240px;
+        padding: 14px 16px;
+        border-radius: var(--radius-md);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(255, 255, 255, 0.025);
+        color: var(--text-tertiary);
+        font-size: 12px;
+        line-height: 1.55;
+      }
+
+      .hero-note a {
+        color: var(--accent);
+      }
+
+      .app-grid {
+        position: relative;
+        z-index: 1;
+        display: grid;
+        grid-template-columns: minmax(0, 1.2fr) minmax(300px, 0.82fr);
+        gap: 18px;
+        padding: 24px 28px 28px;
+      }
+
+      .stack {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+      }
+
+      .panel {
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--border);
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01)),
+          var(--surface);
+        padding: 18px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .panel::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent 22%);
+        pointer-events: none;
+      }
+
+      .panel > * {
+        position: relative;
+        z-index: 1;
+      }
+
+      .panel-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 16px;
+      }
+
+      .panel-title {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .eyebrow {
+        color: var(--accent);
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        font-size: 11px;
+        font-weight: 700;
+      }
+
+      .panel h2,
+      .panel h3 {
+        margin: 0;
+      }
+
+      .panel h2 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        letter-spacing: -0.03em;
+      }
+
+      .panel-subtitle {
+        color: var(--text-tertiary);
+        font-size: 14px;
+        line-height: 1.6;
       }
 
       form {
         margin: 0;
-        border-radius: 16px;
-        border: 1px solid var(--border);
-        background: radial-gradient(circle at top left, #020617 0, #020617 50%);
-        padding: 16px 14px 14px 14px;
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
       }
 
       .field-grid {
         display: grid;
-        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-        gap: 10px 14px;
-      }
-
-      @media (max-width: 640px) {
-        .field-grid {
-          grid-template-columns: minmax(0, 1fr);
-        }
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
       }
 
       .field {
         display: flex;
         flex-direction: column;
-        gap: 4px;
-        font-size: 12px;
+        gap: 8px;
+      }
+
+      .field--full {
+        grid-column: 1 / -1;
       }
 
       label {
-        color: var(--text-soft);
+        color: var(--text-secondary);
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+      }
+
+      .field small {
+        color: var(--text-tertiary);
+        font-size: 12px;
       }
 
       select,
       input[type="text"],
       input[type="number"] {
-        border-radius: 10px;
-        border: 1px solid rgba(55, 65, 81, 0.9);
-        background: rgba(15, 23, 42, 0.95);
+        width: 100%;
+        min-width: 0;
+        min-height: 50px;
+        padding: 0 14px;
+        border-radius: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(15, 15, 20, 0.95);
         color: var(--text);
-        font: inherit;
-        padding: 6px 8px;
         outline: none;
+        transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      select:hover,
+      input[type="text"]:hover,
+      input[type="number"]:hover {
+        border-color: rgba(255, 255, 255, 0.14);
       }
 
       select:focus,
       input[type="text"]:focus,
       input[type="number"]:focus {
-        border-color: var(--accent-strong);
-        box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.35);
+        border-color: rgba(125, 211, 252, 0.62);
+        box-shadow: 0 0 0 1px rgba(125, 211, 252, 0.15);
+        background: rgba(18, 18, 26, 0.98);
       }
 
       input::placeholder {
-        color: rgba(148, 163, 184, 0.75);
+        color: #80808e;
       }
 
-      .field-inline {
+      .toggle-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .toggle {
         display: flex;
         align-items: center;
-        gap: 6px;
-        font-size: 12px;
+        gap: 10px;
+        min-height: 50px;
+        padding: 0 14px;
+        border-radius: 14px;
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.025);
+        color: var(--text-secondary);
+      }
+
+      .toggle span {
+        font-size: 13px;
+        font-weight: 600;
       }
 
       input[type="checkbox"] {
-        width: 14px;
-        height: 14px;
+        width: 18px;
+        height: 18px;
         accent-color: var(--accent-strong);
+        flex: none;
       }
 
-      .buttons {
+      .button-row {
         display: flex;
-        justify-content: flex-start;
-        align-items: center;
-        gap: 12px;
-        margin-top: 6px;
-      }
-
-      .btn-row {
-        display: flex;
-        gap: 8px;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 4px;
       }
 
       button {
-        border-radius: 999px;
-        padding: 7px 14px;
+        appearance: none;
         border: 1px solid transparent;
-        font: inherit;
+        min-height: 48px;
+        padding: 0 18px;
+        border-radius: 14px;
         cursor: pointer;
-        position: relative;
-        overflow: hidden;
-        white-space: nowrap;
+        transition:
+          transform 0.16s ease,
+          border-color 0.16s ease,
+          background 0.16s ease,
+          box-shadow 0.16s ease,
+          color 0.16s ease;
+      }
+
+      button:hover {
+        transform: translateY(-1px);
+      }
+
+      button:active {
+        transform: translateY(1px);
       }
 
       .btn-primary {
-        background: radial-gradient(circle at top left, #38bdf8, #0ea5e9);
-        color: #020617;
-        font-weight: 600;
-        min-width: 130px;
+        background: linear-gradient(135deg, #f5f7ff 0%, #7dd3fc 45%, #38bdf8 100%);
+        color: #0b0f15;
+        font-weight: 800;
+        box-shadow: 0 14px 28px rgba(56, 189, 248, 0.18);
       }
 
       .btn-primary:hover {
-        filter: brightness(1.05);
+        box-shadow: 0 18px 34px rgba(56, 189, 248, 0.24);
       }
 
       .btn-ghost {
-        background: rgba(15, 23, 42, 0.95);
-        color: var(--text-soft);
-        border-color: rgba(55, 65, 81, 0.95);
+        background: rgba(255, 255, 255, 0.035);
+        border-color: rgba(255, 255, 255, 0.08);
+        color: var(--text);
+        font-weight: 700;
       }
 
       .btn-ghost:hover {
-        border-color: rgba(75, 85, 99, 1);
-        color: var(--text);
+        background: rgba(255, 255, 255, 0.06);
+        border-color: rgba(255, 255, 255, 0.14);
       }
 
-      .status-pill {
-        padding: 4px 10px;
-        border-radius: var(--radius-pill);
-        font-size: 11px;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        border: 1px solid rgba(55, 65, 81, 1);
-        background: rgba(15, 23, 42, 0.95);
-        color: var(--text-soft);
-        position: relative;
-        z-index: 2;
+      .info-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
       }
 
-      .status-dot {
-        width: 6px;
-        height: 6px;
-        border-radius: var(--radius-pill);
-        background: var(--text-soft);
-      }
-
-      .status-pill[data-state="idle"] .status-dot {
-        background: var(--text-soft);
-      }
-
-      .status-pill[data-state="running"] .status-dot {
-        background: var(--accent-strong);
-        box-shadow: 0 0 12px rgba(56, 189, 248, 0.9);
-      }
-
-      .status-pill[data-state="done"] .status-dot {
-        background: var(--success);
-        box-shadow: 0 0 12px rgba(74, 222, 128, 0.85);
-      }
-
-      .status-pill[data-state="error"] .status-dot {
-        background: var(--danger);
-        box-shadow: 0 0 12px rgba(248, 113, 113, 0.85);
-      }
-
-      .right {
+      .info-card {
+        min-height: 116px;
+        border-radius: var(--radius-md);
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.025);
+        padding: 14px;
         display: flex;
         flex-direction: column;
-        gap: 14px;
+        justify-content: space-between;
+        gap: 10px;
       }
 
-      .panel {
-        border-radius: 16px;
-        border: 1px solid var(--border);
-        background: radial-gradient(circle at top, #020617 0, #020617 40%);
-        padding: 14px;
-        position: relative;
-      }
-
-      .panel h3 {
-        margin: 0 0 8px 0;
-        font-size: 13px;
-        color: var(--text-soft);
+      .info-card__label {
+        color: var(--text-tertiary);
+        font-size: 11px;
         text-transform: uppercase;
         letter-spacing: 0.12em;
+        font-weight: 700;
+      }
+
+      .info-card__value {
+        font-size: 1.2rem;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+      }
+
+      .info-card__meta {
+        color: var(--text-tertiary);
+        font-size: 12px;
+        line-height: 1.5;
       }
 
       .progress-shell {
-        margin-top: 6px;
-        border-radius: 999px;
-        border: 1px solid rgba(31, 41, 55, 1);
-        background: rgba(15, 23, 42, 0.9);
-        padding: 2px;
-        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
       }
 
       .progress-track {
         width: 100%;
-        height: 9px;
-        border-radius: 999px;
-        background: rgba(17, 24, 39, 1);
+        height: 12px;
+        border-radius: var(--radius-pill);
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.06);
         overflow: hidden;
-        position: relative;
       }
 
       .progress-bar {
-        height: 100%;
         width: 0%;
-        border-radius: 999px;
-        background: linear-gradient(90deg, #38bdf8, #0ea5e9);
-        transition: width 0.3s ease-out;
+        height: 100%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, #7dd3fc, #38bdf8, #0ea5e9);
+        transition: width 0.28s ease;
       }
 
-      .progress-label-row {
+      .progress-meta {
         display: flex;
-        justify-content: space-between;
         align-items: center;
-        margin-top: 6px;
-        font-size: 11px;
-        color: var(--text-soft);
+        justify-content: space-between;
+        gap: 12px;
+        color: var(--text-secondary);
+        font-size: 13px;
       }
 
       .toast {
-        font-size: 11px;
+        min-height: 19px;
         color: var(--accent);
+        font-size: 12px;
         opacity: 0;
         transform: translateY(4px);
-        transition: opacity 0.2s ease-out, transform 0.2s ease-out;
-        margin-top: 6px;
+        transition: opacity 0.2s ease, transform 0.2s ease;
       }
 
       .toast.show {
@@ -421,38 +546,89 @@
         transform: translateY(0);
       }
 
-      .log-panel {
-        border-radius: 16px;
+      .permalink-box {
+        padding: 14px;
+        border-radius: 14px;
         border: 1px solid var(--border);
-        background: radial-gradient(circle at top left, #020617 0, #020617 55%);
-        padding: 10px;
+        background: rgba(255, 255, 255, 0.025);
         display: flex;
         flex-direction: column;
-        gap: 6px;
-        width: 100%;
-        position: relative;
-        z-index: 1;
+        gap: 10px;
       }
 
-      .log-header {
+      .permalink-box__label {
+        color: var(--text-tertiary);
         font-size: 11px;
         text-transform: uppercase;
         letter-spacing: 0.12em;
-        color: var(--text-soft);
+        font-weight: 700;
+      }
+
+      .permalink-box code {
+        display: block;
+        font-family: "IBM Plex Mono", ui-monospace, monospace;
+        font-size: 12px;
+        line-height: 1.6;
+        color: #d8f3ff;
+        word-break: break-all;
+        white-space: pre-wrap;
+      }
+
+      .log-panel {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .log-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .log-header span:first-child {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        color: var(--text-tertiary);
+        font-weight: 700;
+      }
+
+      .log-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        min-height: 28px;
+        padding: 0 10px;
+        border-radius: var(--radius-pill);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(255, 255, 255, 0.025);
+        color: var(--text-tertiary);
+        font-size: 11px;
+        font-weight: 700;
       }
 
       #consoleText {
-        font-size: 11px;
-        background: rgba(15, 23, 42, 0.95);
-        border-radius: 12px;
-        border: 1px solid rgba(31, 41, 55, 1);
-        padding: 8px 9px;
-        white-space: pre-wrap;
-        max-height: 150px;
-        overflow-y: auto;
-        width: 100%;
-        box-sizing: border-box;
         display: block;
+        min-height: 320px;
+        max-height: 420px;
+        overflow: auto;
+        padding: 14px;
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        background: rgba(12, 12, 18, 0.96);
+        color: #b7dfff;
+        font-family: "IBM Plex Mono", ui-monospace, monospace;
+        font-size: 12px;
+        line-height: 1.68;
+        white-space: pre-wrap;
+      }
+
+      .footer-note {
+        color: var(--text-tertiary);
+        font-size: 12px;
+        line-height: 1.6;
       }
 
       noscript {
@@ -461,18 +637,20 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        background: rgba(15, 23, 42, 0.95);
+        background: rgba(15, 15, 20, 0.96);
         z-index: 9999;
       }
 
       noscript p {
-        max-width: 420px;
+        width: min(460px, calc(100% - 32px));
+        margin: 0;
         padding: 18px 20px;
-        border-radius: 16px;
-        background: #020617;
-        border: 1px solid #ef4444;
+        border-radius: 18px;
+        border: 1px solid rgba(239, 68, 68, 0.35);
+        background: #12121a;
         color: #fecaca;
-        font-size: 12px;
+        font-size: 13px;
+        line-height: 1.6;
       }
 
       a[download] {
@@ -481,173 +659,284 @@
         opacity: 0;
         pointer-events: none;
       }
+
+      @media (max-width: 980px) {
+        .app-grid {
+          grid-template-columns: minmax(0, 1fr);
+        }
+
+        .hero {
+          flex-direction: column;
+        }
+
+        .hero-side {
+          align-items: flex-start;
+          min-width: 0;
+        }
+      }
+
+      @media (max-width: 720px) {
+        .page {
+          padding: 0;
+        }
+
+        .app-shell {
+          min-height: 100vh;
+          border-radius: 0;
+          border-left: 0;
+          border-right: 0;
+        }
+
+        .hero,
+        .app-grid {
+          padding-left: 16px;
+          padding-right: 16px;
+        }
+
+        .hero {
+          padding-top: 22px;
+          padding-bottom: 18px;
+        }
+
+        .app-grid {
+          padding-top: 18px;
+          padding-bottom: 22px;
+        }
+
+        .field-grid,
+        .toggle-grid,
+        .info-grid {
+          grid-template-columns: minmax(0, 1fr);
+        }
+
+        .button-row {
+          flex-direction: column;
+        }
+
+        .button-row button {
+          width: 100%;
+        }
+
+        #consoleText {
+          min-height: 240px;
+          max-height: 320px;
+        }
+      }
     </style>
   </head>
-
   <body>
     <noscript>
       <p>
-        This site doesn't work without JavaScript enabled. Please enable
-        JavaScript and reload the page.
+        This site does not work without JavaScript. Enable it and reload the page.
       </p>
     </noscript>
 
-    <div class="shell">
-      <div class="chrome">
-        <div class="dot"></div>
-        <div class="dot"></div>
-        <div class="dot"></div>
-        <div class="title-bar">rdd – roblox deployment downloader</div>
-      </div>
-
-      <div class="content">
-        <!-- LEFT COLUMN -->
-        <div class="left">
-          <div class="heading">
-            <div class="heading-main">
-              <h1>RDD</h1>
-              <span>
-                Unofficial fork – downloads are still fetched directly from Roblox
-                CDN.
-              </span>
-            </div>
-            <div class="heading-right">
-              <div class="badge">
-                <span class="badge-dot"></span>
-                <span>Static client-side only</span>
+    <div class="page">
+      <div class="app-shell">
+        <header class="hero">
+          <div class="hero-copy">
+            <div class="hero-badge-row">
+              <div class="hero-badge">
+                <span class="hero-badge__dot"></span>
+                <strong>RDD</strong>
+                <span>Client-side downloader</span>
               </div>
-              <div id="statusPill" class="status-pill" data-state="idle">
-                <span class="status-dot"></span>
-                <span id="statusLabel">Idle</span>
+              <div class="hero-badge">
+                <span>Roblox deployments</span>
               </div>
             </div>
+            <h1>Roblox Deployment Downloader</h1>
+            <p>
+              Build direct download links for Roblox player and studio deployments,
+              pin a specific version hash, and package the result without leaving the page.
+            </p>
           </div>
 
-          <div class="disclaimer">
-            RDD – "Roblox Deployment Downloader" (
-            <a
-              href="https://github.com/latte-soft/rdd"
-              target="_blank"
-              rel="noreferrer"
-            >
-              GitHub
-            </a>
-            )<br />
-            Copyright (c) 2024-2025 Latte Softworks
-            <a href="https://latte.to" target="_blank" rel="noreferrer">
-              &lt;latte.to&gt;
-            </a>
-            · MIT License. The only
-            <i>official</i>
-            host is
-            <a href="https://rdd.latte.to" target="_blank" rel="noreferrer">
-              rdd.latte.to
-            </a>
-            . This is an unofficial rehost.
+          <div class="hero-side">
+            <div id="statusPill" class="status-pill" data-state="idle">
+              <span class="status-dot"></span>
+              <span id="statusLabel">Idle</span>
+            </div>
+            <div class="hero-note">
+              Original project:
+              <a href="https://github.com/latte-soft/rdd" target="_blank" rel="noreferrer">latte-soft/rdd</a>.
+              Downloads still come directly from the Roblox CDN.
+            </div>
           </div>
+        </header>
 
-          <!-- RDD FORM (keeps original IDs so rdd.js still works) -->
-          <div hidden id="downloadFormDiv">
-            <form id="downloadForm" action="">
-              <div class="field-grid">
-                <div class="field">
-                  <label for="binaryType">Binary Type</label>
-                  <select id="binaryType" name="binaryType">
-                    <option value="WindowsPlayer">WindowsPlayer</option>
-                    <option value="WindowsStudio64">WindowsStudio64</option>
-                    <option value="MacPlayer">MacPlayer</option>
-                    <option value="MacStudio">MacStudio</option>
-                  </select>
-                </div>
-
-                <div class="field">
-                  <label for="channel">Channel Name</label>
-                  <input
-                    id="channel"
-                    name="channel"
-                    type="text"
-                    placeholder="LIVE"
-                  />
-                </div>
-
-                <div class="field">
-                  <label for="version">
-                    Version Hash <span>(Optional)</span>
-                  </label>
-                  <input id="version" name="version" type="text" />
-                </div>
-
-                <div class="field">
-                  <label for="compressionLevel">
-                    Zip Compression Level (1-9)
-                  </label>
-                  <input
-                    id="compressionLevel"
-                    name="compressionLevel"
-                    type="number"
-                    min="1"
-                    max="9"
-                    value="5"
-                  />
+        <main class="app-grid">
+          <div class="stack">
+            <section class="panel">
+              <div class="panel-head">
+                <div class="panel-title">
+                  <span class="eyebrow">Build Config</span>
+                  <h2>Deployment request</h2>
+                  <div class="panel-subtitle">
+                    Pick a binary, channel, and optional hash. The original downloader
+                    IDs are preserved so the existing RDD logic keeps working.
+                  </div>
                 </div>
               </div>
 
-              <div class="field-inline" style="margin-top: 6px">
-                <input id="compressZip" name="compressZip" type="checkbox" />
-                <label for="compressZip" style="margin: 0">
-                  Compress output zip
-                </label>
-              </div>
-
-              <div class="buttons">
-                <div class="btn-row">
-                    <button
-                        id="downloadButton"
-                        type="button"
-                        class="btn-primary"
-                        onclick="downloadFromForm();"
-                        >
-                        Download deployment
-                        </button>
-                        <button
-                        id="copyLinkButton"
-                        type="button"
-                        class="btn-ghost"
-                        onclick="copyPermLink();"
-                        >
-                        Copy permanent link
-                        </button>
+              <div hidden id="downloadFormDiv">
+                <form id="downloadForm" action="">
+                  <div class="field-grid">
+                    <div class="field">
+                      <label for="binaryType">Binary type</label>
+                      <select id="binaryType" name="binaryType">
+                        <option value="WindowsPlayer">WindowsPlayer</option>
+                        <option value="WindowsStudio64">WindowsStudio64</option>
+                        <option value="MacPlayer">MacPlayer</option>
+                        <option value="MacStudio">MacStudio</option>
+                      </select>
                     </div>
-                </div>
-            </form>
-          </div>
-        </div>
 
-        <!-- RIGHT COLUMN -->
-        <div class="right">
-          <div class="panel">
-            <h3>Download progress</h3>
-            <div class="progress-shell">
-              <div class="progress-track">
-                <div id="progressBar" class="progress-bar" style="width: 0%"></div>
+                    <div class="field">
+                      <label for="channel">Channel</label>
+                      <input
+                        id="channel"
+                        name="channel"
+                        type="text"
+                        placeholder="LIVE"
+                      />
+                    </div>
+
+                    <div class="field">
+                      <label for="version">Version hash</label>
+                      <input
+                        id="version"
+                        name="version"
+                        type="text"
+                        placeholder="version-xxxxxxxxxxxxxxxx"
+                      />
+                    </div>
+
+                    <div class="field">
+                      <label for="compressionLevel">Compression level</label>
+                      <input
+                        id="compressionLevel"
+                        name="compressionLevel"
+                        type="number"
+                        min="1"
+                        max="9"
+                        value="5"
+                      />
+                    </div>
+                  </div>
+
+                  <div class="toggle-grid" style="margin-top: 14px">
+                    <label class="toggle" for="compressZip">
+                      <input id="compressZip" name="compressZip" type="checkbox" />
+                      <span>Compress output zip</span>
+                    </label>
+
+                    <div class="toggle" aria-hidden="true">
+                      <span>Source: setup-aws.rbxcdn.com</span>
+                    </div>
+                  </div>
+
+                  <div class="button-row" style="margin-top: 16px">
+                    <button
+                      id="downloadButton"
+                      type="button"
+                      class="btn-primary"
+                      onclick="downloadFromForm();"
+                    >
+                      Download deployment
+                    </button>
+                    <button
+                      id="copyLinkButton"
+                      type="button"
+                      class="btn-ghost"
+                      onclick="copyPermLink();"
+                    >
+                      Copy permanent link
+                    </button>
+                  </div>
+                </form>
               </div>
-            </div>
-            <div class="progress-label-row">
-              <span id="progressLabel">Waiting to start…</span>
-              <span id="progressPercent">0%</span>
-            </div>
-            <div id="toast" class="toast"></div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-head">
+                <div class="panel-title">
+                  <span class="eyebrow">Snapshot</span>
+                  <h2>Quick details</h2>
+                </div>
+              </div>
+
+              <div class="info-grid">
+                <div class="info-card">
+                  <div class="info-card__label">Binary</div>
+                  <div id="summaryBinary" class="info-card__value">WindowsPlayer</div>
+                  <div class="info-card__meta">Current selected Roblox binary.</div>
+                </div>
+                <div class="info-card">
+                  <div class="info-card__label">Channel</div>
+                  <div id="summaryChannel" class="info-card__value">LIVE</div>
+                  <div class="info-card__meta">Defaults to production if left blank.</div>
+                </div>
+                <div class="info-card">
+                  <div class="info-card__label">Version</div>
+                  <div id="summaryVersion" class="info-card__value">Latest</div>
+                  <div class="info-card__meta">Specific hash is optional.</div>
+                </div>
+              </div>
+            </section>
           </div>
 
-          <div class="log-panel">
-            <div class="log-header">Download log</div>
-            <output id="consoleText"></output>
+          <div class="stack">
+            <section class="panel">
+              <div class="panel-head">
+                <div class="panel-title">
+                  <span class="eyebrow">Progress</span>
+                  <h2>Download state</h2>
+                </div>
+              </div>
+
+              <div class="progress-shell">
+                <div class="progress-track">
+                  <div id="progressBar" class="progress-bar" style="width: 0%"></div>
+                </div>
+                <div class="progress-meta">
+                  <span id="progressLabel">Waiting to start...</span>
+                  <strong id="progressPercent">0%</strong>
+                </div>
+                <div id="toast" class="toast"></div>
+              </div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-head">
+                <div class="panel-title">
+                  <span class="eyebrow">Permalink</span>
+                  <h2>Generated request</h2>
+                </div>
+              </div>
+
+              <div class="permalink-box">
+                <div class="permalink-box__label">Current link</div>
+                <code id="permalinkPreview">Waiting for form data...</code>
+              </div>
+            </section>
+
+            <section class="panel log-panel">
+              <div class="log-header">
+                <span>Download log</span>
+                <span class="log-chip">Live output</span>
+              </div>
+              <output id="consoleText"></output>
+              <div class="footer-note">
+                If the browser blocks a download, allow popups/downloads for this page and try again.
+              </div>
+            </section>
           </div>
-        </div>
+        </main>
       </div>
     </div>
 
-        <script src="js/jszip.min.js"></script>
+    <script src="js/jszip.min.js"></script>
     <script src="js/rdd.js"></script>
     <script>
       (function () {
@@ -659,6 +948,11 @@
         var toast = document.getElementById("toast");
         var consoleText = document.getElementById("consoleText");
         var formDiv = document.getElementById("downloadFormDiv");
+        var permalinkPreview = document.getElementById("permalinkPreview");
+        var summaryBinary = document.getElementById("summaryBinary");
+        var summaryChannel = document.getElementById("summaryChannel");
+        var summaryVersion = document.getElementById("summaryVersion");
+        var form = document.getElementById("downloadForm");
 
         if (!statusPill || !progressBar) return;
 
@@ -710,7 +1004,7 @@
             var max = 90;
             var eased = max - max * Math.exp(-t / 24);
             if (progressValue < eased) {
-              setProgress(eased, "Downloading & assembling deployment…");
+              setProgress(eased, "Downloading and assembling deployment...");
             }
           }, 350);
         }
@@ -725,14 +1019,39 @@
           setProgress(100, ok ? "Download ready" : "Download failed");
           setStatus(ok ? "done" : "error", ok ? "Completed" : "Failed");
           if (ok) {
-            showToast("Download finished – your browser should start saving.");
+            showToast("Download finished. Your browser should start saving.");
           } else {
             showToast("Download failed. Check devtools console for details.");
           }
         }
 
+        function updateSummary() {
+          if (!form) return;
+          if (summaryBinary && form.binaryType) {
+            summaryBinary.textContent = form.binaryType.value || "Unknown";
+          }
+          if (summaryChannel && form.channel) {
+            summaryChannel.textContent = form.channel.value.trim() || form.channel.placeholder || "LIVE";
+          }
+          if (summaryVersion && form.version) {
+            summaryVersion.textContent = form.version.value.trim() || "Latest";
+          }
+          if (permalinkPreview && typeof window.getPermLink === "function") {
+            permalinkPreview.textContent = window.getPermLink();
+          }
+        }
+
         if (formDiv) {
           formDiv.hidden = false;
+        }
+
+        if (form) {
+          Array.prototype.forEach.call(form.elements, function (field) {
+            if (!field || !field.addEventListener) return;
+            field.addEventListener("input", updateSummary);
+            field.addEventListener("change", updateSummary);
+          });
+          updateSummary();
         }
 
         if (consoleText) {
@@ -776,8 +1095,9 @@
         if (typeof window.downloadFromForm === "function") {
           var origDownloadFromForm = window.downloadFromForm;
           window.downloadFromForm = function () {
+            updateSummary();
             setStatus("running", "Downloading");
-            setProgress(0, "Preparing request…");
+            setProgress(0, "Preparing request...");
             startProgressLoop();
             return origDownloadFromForm.apply(this, arguments);
           };
@@ -788,6 +1108,7 @@
           window.copyPermLink = function () {
             try {
               var res = origCopyPermLink.apply(this, arguments);
+              updateSummary();
               showToast("Permanent link copied to clipboard.");
               return res;
             } catch (e) {
@@ -799,12 +1120,13 @@
 
         var hasQuery = window.location.search && window.location.search.length > 1;
         if (hasQuery) {
+          updateSummary();
           setStatus("running", "Downloading");
-          setProgress(0, "Preparing request…");
+          setProgress(0, "Preparing request...");
           startProgressLoop();
         } else {
           setStatus("idle", "Idle");
-          setProgress(0, "Waiting to start…");
+          setProgress(0, "Waiting to start...");
         }
       })();
     </script>
