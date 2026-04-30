@@ -798,7 +798,7 @@
                         id="channel"
                         name="channel"
                         type="text"
-                        placeholder="LIVE"
+                        placeholder="production"
                       />
                     </div>
 
@@ -874,7 +874,7 @@
                 </div>
                 <div class="info-card">
                   <div class="info-card__label">Channel</div>
-                  <div id="summaryChannel" class="info-card__value">LIVE</div>
+                  <div id="summaryChannel" class="info-card__value">production</div>
                   <div class="info-card__meta">Defaults to production if left blank.</div>
                 </div>
                 <div class="info-card">
@@ -1031,7 +1031,7 @@
             summaryBinary.textContent = form.binaryType.value || "Unknown";
           }
           if (summaryChannel && form.channel) {
-            summaryChannel.textContent = form.channel.value.trim() || form.channel.placeholder || "LIVE";
+            summaryChannel.textContent = form.channel.value.trim() || form.channel.placeholder || "production";
           }
           if (summaryVersion && form.version) {
             summaryVersion.textContent = form.version.value.trim() || "Latest";
