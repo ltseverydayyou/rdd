@@ -356,9 +356,13 @@ function main() {
         const binaryTypeEncoded = escHtml(binaryType);
         const channelNameEncoded = escHtml(channel);
 
-        const clientSettingsUrl = `https://clientsettings.roblox.com/v2/client-version/${binaryTypeEncoded}/channel/${channelNameEncoded}`;
+        const clientSettingsUrls = [
+            `https://clientsettings.roproxy.com/v2/client-version/${binaryTypeEncoded}/channel/${channelNameEncoded}`,
+            `https://clientsettings.rotunnel.com/v2/client-version/${binaryTypeEncoded}/channel/${channelNameEncoded}`,
+            `https://clientsettings.roblox.com/v2/client-version/${binaryTypeEncoded}/channel/${channelNameEncoded}`
+        ];
         log("Copy the version hash (the area with \"version-xxxxxxxxxxxxxxxx\" in double-quotes) from the page in the link below (we can't because of CORS), and paste it in the field named \"Version Hash\" in the form above\n");
-        consoleText.innerHTML += `<a target="_blank" href="${clientSettingsUrl}">${clientSettingsUrl}</a><br><br><br>`;
+        consoleText.innerHTML += `${clientSettingsUrls.map((clientSettingsUrl) => `<a target="_blank" href="${clientSettingsUrl}">${clientSettingsUrl}</a>`).join("<br>")}<br><br><br>`;
 
         // Same options as may have been input from the page before
         downloadForm.channel.value = channelNameEncoded;
