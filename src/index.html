@@ -6,47 +6,29 @@
     <link rel="icon" href="favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style>
-      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap");
-
       :root {
         color-scheme: dark;
-        --bg: #070911;
-        --bg-secondary: #0d111c;
-        --bg-tertiary: #121827;
-        --bg-quaternary: #1b2335;
-        --surface: rgba(12, 16, 27, 0.76);
-        --surface-strong: rgba(8, 11, 19, 0.92);
-        --surface-soft: rgba(255, 255, 255, 0.045);
-        --border: rgba(185, 214, 255, 0.1);
-        --border-strong: rgba(185, 214, 255, 0.18);
-        --text: #f3f7ff;
-        --text-secondary: #cbd6e8;
-        --text-tertiary: #8d9ab2;
-        --accent: #8ad7ff;
-        --accent-strong: #38bdf8;
-        --accent-soft: rgba(56, 189, 248, 0.16);
-        --success: #33d17a;
-        --danger: #ff5f73;
-        --warning: #fbbf24;
-        --shadow: 0 30px 90px rgba(0, 0, 0, 0.58);
-        --inner-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
-        --radius-xl: 34px;
-        --radius-lg: 24px;
-        --radius-md: 18px;
-        --radius-sm: 14px;
-        --radius-pill: 999px;
-        --ease: cubic-bezier(0.22, 1, 0.36, 1);
-        --mx: 50%;
-        --my: 0%;
+        --bg: #0b0d10;
+        --panel: #111419;
+        --panel-2: #151920;
+        --panel-3: #0d1014;
+        --border: #252b34;
+        --border-strong: #343c47;
+        --text: #f1f3f5;
+        --muted: #929aa5;
+        --muted-2: #68717d;
+        --accent: #5fb3ff;
+        --accent-hover: #79c0ff;
+        --success: #48c774;
+        --danger: #f56c7a;
+        --warning: #d8a84e;
+        --radius: 8px;
+        --radius-sm: 6px;
+        --radius-xs: 4px;
       }
 
       * {
         box-sizing: border-box;
-      }
-
-      *::selection {
-        background: rgba(56, 189, 248, 0.28);
-        color: var(--text);
       }
 
       html,
@@ -56,61 +38,23 @@
       }
 
       html {
-        scroll-behavior: smooth;
+        background: var(--bg);
       }
 
       body {
         margin: 0;
-        font-family: "Inter", system-ui, sans-serif;
-        background:
-          radial-gradient(circle at 18% 8%, rgba(56, 189, 248, 0.2), transparent 30%),
-          radial-gradient(circle at 88% 24%, rgba(99, 102, 241, 0.2), transparent 34%),
-          linear-gradient(135deg, #060812 0%, #0a1020 42%, #070911 100%);
         color: var(--text);
-        position: relative;
-        overflow-x: hidden;
-        text-rendering: geometricPrecision;
-      }
-
-      body::before {
-        content: "";
-        position: fixed;
-        inset: 0;
-        background-image:
-          linear-gradient(to right, rgba(148, 163, 184, 0.08) 1px, transparent 1px),
-          linear-gradient(to bottom, rgba(148, 163, 184, 0.08) 1px, transparent 1px);
-        background-size: 72px 72px;
-        mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.8), transparent 82%);
-        pointer-events: none;
-        z-index: -4;
-        animation: gridDrift 20s linear infinite;
-      }
-
-      body::after {
-        content: "";
-        position: fixed;
-        inset: -18%;
-        background:
-          radial-gradient(circle at 20% 18%, rgba(56, 189, 248, 0.16), transparent 34%),
-          radial-gradient(circle at 72% 12%, rgba(129, 140, 248, 0.14), transparent 32%),
-          radial-gradient(circle at 82% 80%, rgba(14, 165, 233, 0.12), transparent 30%);
-        filter: blur(24px);
-        opacity: 0.9;
-        pointer-events: none;
-        z-index: -3;
-        animation: auroraMove 12s var(--ease) infinite alternate;
-      }
-
-      a {
-        color: inherit;
-        text-decoration: none;
-      }
-
-      a,
-      button,
-      select,
-      input {
-        -webkit-tap-highlight-color: transparent;
+        background: var(--bg);
+        font-family:
+          Inter,
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+        font-size: 14px;
+        line-height: 1.5;
       }
 
       button,
@@ -119,366 +63,230 @@
         font: inherit;
       }
 
+      button,
+      input,
+      select,
+      a {
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+
+      a:hover {
+        text-decoration: underline;
+      }
+
       .page {
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 34px 18px;
-        perspective: 1200px;
+        width: 100%;
+        padding: 28px;
       }
 
       .app-shell {
         width: min(1180px, 100%);
-        border-radius: var(--radius-xl);
-        border: 1px solid var(--border);
-        background:
-          radial-gradient(circle at var(--mx) var(--my), rgba(125, 211, 252, 0.18), transparent 28%),
-          linear-gradient(180deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.025)),
-          rgba(8, 11, 19, 0.78);
-        box-shadow: var(--shadow), var(--inner-shadow);
-        overflow: hidden;
-        position: relative;
-        backdrop-filter: blur(26px) saturate(148%);
-        transform-origin: center;
-        animation: shellIn 0.8s var(--ease) both;
+        margin: 0 auto;
       }
 
-      .app-shell::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        background:
-          linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, 0.055) 24%, transparent 46%),
-          radial-gradient(circle at top left, rgba(125, 211, 252, 0.16), transparent 30%),
-          radial-gradient(circle at bottom right, rgba(99, 102, 241, 0.12), transparent 32%);
-        pointer-events: none;
-      }
-
-      .app-shell::after {
-        content: "";
-        position: absolute;
-        inset: 1px;
-        border-radius: calc(var(--radius-xl) - 1px);
-        border: 1px solid rgba(255, 255, 255, 0.04);
-        pointer-events: none;
-      }
-
-      .hero {
-        position: relative;
-        z-index: 1;
-        padding: 32px 32px 26px;
-        border-bottom: 1px solid rgba(185, 214, 255, 0.08);
+      .topbar {
         display: flex;
-        align-items: flex-start;
+        align-items: center;
         justify-content: space-between;
-        gap: 26px;
+        gap: 20px;
+        min-height: 64px;
+        margin-bottom: 16px;
+        padding: 14px 16px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: var(--panel);
       }
 
-      .hero::after {
-        content: "";
-        position: absolute;
-        left: 32px;
-        right: 32px;
-        bottom: -1px;
-        height: 1px;
-        background: linear-gradient(90deg, transparent, rgba(125, 211, 252, 0.65), transparent);
-        opacity: 0.55;
-      }
-
-      .hero-copy {
-        max-width: 720px;
-        animation: fadeUp 0.72s var(--ease) 0.08s both;
-      }
-
-      .hero-badge-row {
+      .brand {
         display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        margin-bottom: 18px;
+        align-items: center;
+        gap: 12px;
+        min-width: 0;
       }
 
-      .hero-badge,
+      .brand-mark {
+        display: grid;
+        place-items: center;
+        width: 36px;
+        height: 36px;
+        flex: none;
+        border: 1px solid var(--border-strong);
+        border-radius: var(--radius-sm);
+        background: #171c23;
+        color: var(--text);
+        font-weight: 800;
+        letter-spacing: -0.04em;
+      }
+
+      .brand-copy {
+        min-width: 0;
+      }
+
+      .brand-title {
+        margin: 0;
+        font-size: 15px;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+      }
+
+      .brand-subtitle {
+        margin-top: 2px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
       .status-pill {
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        min-height: 36px;
-        padding: 0 13px;
-        border-radius: var(--radius-pill);
-        border: 1px solid var(--border-strong);
-        background:
-          linear-gradient(180deg, rgba(255, 255, 255, 0.085), rgba(255, 255, 255, 0.035)),
-          rgba(255, 255, 255, 0.025);
-        color: var(--text-secondary);
+        min-height: 32px;
+        padding: 0 11px;
+        flex: none;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        background: var(--panel-2);
+        color: var(--muted);
         font-size: 12px;
         font-weight: 700;
-        letter-spacing: 0.04em;
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
       }
 
-      .hero-badge {
-        transition: transform 0.22s var(--ease), border-color 0.22s var(--ease), background 0.22s var(--ease);
-      }
-
-      .hero-badge:hover {
-        transform: translateY(-2px);
-        border-color: rgba(125, 211, 252, 0.28);
-        background: rgba(125, 211, 252, 0.06);
-      }
-
-      .hero-badge strong {
-        color: var(--text);
-      }
-
-      .hero-badge__dot,
       .status-dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: var(--text-tertiary);
-        flex: none;
-      }
-
-      .hero-badge__dot {
-        background: var(--success);
-        box-shadow: 0 0 0 5px rgba(51, 209, 122, 0.1), 0 0 18px rgba(51, 209, 122, 0.75);
-        animation: dotPulse 1.8s ease-in-out infinite;
-      }
-
-      h1 {
-        margin: 0;
-        max-width: 760px;
-        font-size: clamp(2.45rem, 5.5vw, 4.75rem);
-        line-height: 0.91;
-        letter-spacing: -0.075em;
-        font-weight: 900;
-        background: linear-gradient(180deg, #ffffff 0%, #dceeff 46%, #83d7ff 100%);
-        -webkit-background-clip: text;
-        background-clip: text;
-        color: transparent;
-        text-shadow: 0 20px 70px rgba(56, 189, 248, 0.16);
-      }
-
-      .hero-copy p {
-        margin: 18px 0 0;
-        max-width: 64ch;
-        color: var(--text-tertiary);
-        font-size: 15px;
-        line-height: 1.75;
-      }
-
-      .hero-side {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-        gap: 12px;
-        min-width: 232px;
-        animation: fadeUp 0.72s var(--ease) 0.16s both;
-      }
-
-      .status-pill {
-        background:
-          linear-gradient(180deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.035)),
-          rgba(8, 11, 19, 0.62);
-        transition: border-color 0.22s var(--ease), transform 0.22s var(--ease), background 0.22s var(--ease);
-      }
-
-      .status-pill:hover {
-        transform: translateY(-2px);
+        width: 7px;
+        height: 7px;
+        border-radius: 2px;
+        background: var(--muted-2);
       }
 
       .status-pill[data-state="running"] {
-        border-color: rgba(56, 189, 248, 0.34);
-        background: rgba(56, 189, 248, 0.08);
+        border-color: #315f86;
+        color: #aad6ff;
       }
 
       .status-pill[data-state="running"] .status-dot {
-        background: var(--accent-strong);
-        box-shadow: 0 0 0 5px rgba(56, 189, 248, 0.12), 0 0 18px rgba(56, 189, 248, 0.82);
-        animation: dotPulse 1.2s ease-in-out infinite;
+        background: var(--accent);
       }
 
       .status-pill[data-state="done"] {
-        border-color: rgba(51, 209, 122, 0.28);
-        background: rgba(51, 209, 122, 0.07);
+        border-color: #2f6d49;
+        color: #a6e6bd;
       }
 
       .status-pill[data-state="done"] .status-dot {
         background: var(--success);
-        box-shadow: 0 0 0 5px rgba(51, 209, 122, 0.11), 0 0 18px rgba(51, 209, 122, 0.8);
       }
 
       .status-pill[data-state="error"] {
-        border-color: rgba(255, 95, 115, 0.34);
-        background: rgba(255, 95, 115, 0.07);
+        border-color: #7f3d48;
+        color: #ffb4bd;
       }
 
       .status-pill[data-state="error"] .status-dot {
         background: var(--danger);
-        box-shadow: 0 0 0 5px rgba(255, 95, 115, 0.1), 0 0 18px rgba(255, 95, 115, 0.78);
       }
 
-      .hero-note {
-        max-width: 252px;
-        padding: 15px 16px;
-        border-radius: var(--radius-md);
-        border: 1px solid rgba(185, 214, 255, 0.1);
-        background:
-          linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.025)),
-          rgba(255, 255, 255, 0.025);
-        color: var(--text-tertiary);
-        font-size: 12px;
-        line-height: 1.58;
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.045);
+      .intro {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: end;
+        gap: 24px;
+        margin-bottom: 16px;
+        padding: 22px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: var(--panel);
       }
 
-      .hero-note a {
+      .intro-copy {
+        min-width: 0;
+      }
+
+      .kicker {
+        margin-bottom: 8px;
         color: var(--accent);
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        font-size: 11px;
         font-weight: 700;
-        transition: color 0.18s ease;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
       }
 
-      .hero-note a:hover {
-        color: #c8f1ff;
+      h1 {
+        margin: 0;
+        font-size: clamp(1.8rem, 4vw, 3rem);
+        line-height: 1.05;
+        letter-spacing: -0.045em;
+        font-weight: 800;
+      }
+
+      .intro p {
+        max-width: 70ch;
+        margin: 12px 0 0;
+        color: var(--muted);
+      }
+
+      .project-note {
+        max-width: 300px;
+        padding: 12px 14px;
+        border-left: 2px solid var(--border-strong);
+        color: var(--muted);
+        font-size: 12px;
       }
 
       .app-grid {
-        position: relative;
-        z-index: 1;
         display: grid;
-        grid-template-columns: minmax(0, 1.18fr) minmax(320px, 0.82fr);
-        gap: 18px;
-        padding: 24px 32px 32px;
+        grid-template-columns: minmax(0, 1.15fr) minmax(330px, 0.85fr);
+        gap: 16px;
       }
 
       .stack {
         display: flex;
         flex-direction: column;
-        gap: 18px;
+        gap: 16px;
+        min-width: 0;
       }
 
       .panel {
-        border-radius: var(--radius-lg);
         border: 1px solid var(--border);
-        background:
-          linear-gradient(180deg, rgba(255, 255, 255, 0.072), rgba(255, 255, 255, 0.026)),
-          var(--surface);
-        padding: 20px;
-        position: relative;
+        border-radius: var(--radius);
+        background: var(--panel);
         overflow: hidden;
-        box-shadow:
-          0 18px 50px rgba(0, 0, 0, 0.22),
-          inset 0 1px 0 rgba(255, 255, 255, 0.055);
-        transition:
-          transform 0.28s var(--ease),
-          border-color 0.28s var(--ease),
-          background 0.28s var(--ease),
-          box-shadow 0.28s var(--ease);
-        animation: cardIn 0.66s var(--ease) both;
-      }
-
-      .stack:first-child .panel:nth-child(1) {
-        animation-delay: 0.18s;
-      }
-
-      .stack:first-child .panel:nth-child(2) {
-        animation-delay: 0.26s;
-      }
-
-      .stack:last-child .panel:nth-child(1) {
-        animation-delay: 0.22s;
-      }
-
-      .stack:last-child .panel:nth-child(2) {
-        animation-delay: 0.3s;
-      }
-
-      .stack:last-child .panel:nth-child(3) {
-        animation-delay: 0.38s;
-      }
-
-      .panel::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        background:
-          radial-gradient(circle at 12% 0%, rgba(125, 211, 252, 0.12), transparent 32%),
-          linear-gradient(180deg, rgba(255, 255, 255, 0.036), transparent 34%);
-        opacity: 0.82;
-        pointer-events: none;
-        transition: opacity 0.28s var(--ease);
-      }
-
-      .panel::after {
-        content: "";
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(115deg, transparent 0%, rgba(255, 255, 255, 0.055) 40%, transparent 62%);
-        transform: translateX(-115%);
-        pointer-events: none;
-      }
-
-      .panel:hover {
-        transform: translateY(-4px);
-        border-color: rgba(125, 211, 252, 0.2);
-        box-shadow:
-          0 24px 64px rgba(0, 0, 0, 0.32),
-          0 0 42px rgba(56, 189, 248, 0.055),
-          inset 0 1px 0 rgba(255, 255, 255, 0.08);
-      }
-
-      .panel:hover::after {
-        animation: sheen 0.86s var(--ease);
-      }
-
-      .panel > * {
-        position: relative;
-        z-index: 1;
       }
 
       .panel-head {
         display: flex;
-        align-items: flex-start;
+        align-items: center;
         justify-content: space-between;
         gap: 16px;
-        margin-bottom: 18px;
+        min-height: 56px;
+        padding: 13px 16px;
+        border-bottom: 1px solid var(--border);
+        background: var(--panel-2);
       }
 
       .panel-title {
-        display: flex;
-        flex-direction: column;
-        gap: 7px;
-      }
-
-      .eyebrow {
-        color: var(--accent);
-        text-transform: uppercase;
-        letter-spacing: 0.16em;
-        font-size: 11px;
-        font-weight: 800;
-        text-shadow: 0 0 18px rgba(56, 189, 248, 0.28);
-      }
-
-      .panel h2,
-      .panel h3 {
-        margin: 0;
+        min-width: 0;
       }
 
       .panel h2 {
-        font-size: 1.27rem;
-        font-weight: 800;
-        letter-spacing: -0.035em;
+        margin: 0;
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: -0.01em;
       }
 
       .panel-subtitle {
-        color: var(--text-tertiary);
-        font-size: 14px;
-        line-height: 1.62;
+        margin-top: 3px;
+        color: var(--muted);
+        font-size: 12px;
       }
 
-      form {
-        margin: 0;
+      .panel-body {
+        padding: 16px;
       }
 
       .field-grid {
@@ -490,7 +298,8 @@
       .field {
         display: flex;
         flex-direction: column;
-        gap: 8px;
+        gap: 7px;
+        min-width: 0;
       }
 
       .field--full {
@@ -498,16 +307,14 @@
       }
 
       label {
-        color: var(--text-secondary);
-        font-size: 11px;
-        font-weight: 800;
-        text-transform: uppercase;
-        letter-spacing: 0.12em;
+        color: #c7ccd2;
+        font-size: 12px;
+        font-weight: 600;
       }
 
       .field small {
-        color: var(--text-tertiary);
-        font-size: 12px;
+        color: var(--muted-2);
+        font-size: 11px;
       }
 
       select,
@@ -515,47 +322,30 @@
       input[type="number"] {
         width: 100%;
         min-width: 0;
-        min-height: 52px;
-        padding: 0 15px;
-        border-radius: 16px;
-        border: 1px solid rgba(185, 214, 255, 0.1);
-        background:
-          linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.018)),
-          rgba(5, 8, 15, 0.78);
-        color: var(--text);
+        height: 42px;
+        padding: 0 11px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
         outline: none;
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.045);
-        transition:
-          border-color 0.22s var(--ease),
-          background 0.22s var(--ease),
-          box-shadow 0.22s var(--ease),
-          transform 0.22s var(--ease);
-      }
-
-      select {
-        cursor: pointer;
+        background: var(--panel-3);
+        color: var(--text);
       }
 
       select:hover,
       input[type="text"]:hover,
       input[type="number"]:hover {
-        border-color: rgba(185, 214, 255, 0.2);
-        transform: translateY(-1px);
+        border-color: var(--border-strong);
       }
 
       select:focus,
       input[type="text"]:focus,
       input[type="number"]:focus {
-        border-color: rgba(125, 211, 252, 0.68);
-        box-shadow:
-          0 0 0 4px rgba(56, 189, 248, 0.1),
-          0 0 30px rgba(56, 189, 248, 0.08),
-          inset 0 1px 0 rgba(255, 255, 255, 0.06);
-        background: rgba(9, 13, 23, 0.95);
+        border-color: #447cad;
+        box-shadow: 0 0 0 2px rgba(95, 179, 255, 0.12);
       }
 
       input::placeholder {
-        color: #748096;
+        color: #555f6c;
       }
 
       .toggle-grid {
@@ -567,224 +357,132 @@
       .toggle {
         display: flex;
         align-items: center;
-        gap: 11px;
-        min-height: 52px;
-        padding: 0 15px;
-        border-radius: 16px;
+        gap: 10px;
+        min-height: 42px;
+        padding: 0 11px;
         border: 1px solid var(--border);
-        background:
-          linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02)),
-          rgba(255, 255, 255, 0.028);
-        color: var(--text-secondary);
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.045);
-        transition: transform 0.22s var(--ease), border-color 0.22s var(--ease), background 0.22s var(--ease);
-      }
-
-      .toggle:hover {
-        transform: translateY(-2px);
-        border-color: rgba(125, 211, 252, 0.2);
-        background: rgba(125, 211, 252, 0.055);
+        border-radius: var(--radius-sm);
+        background: var(--panel-3);
+        color: #c7ccd2;
       }
 
       .toggle span {
-        font-size: 13px;
-        font-weight: 700;
+        min-width: 0;
+        font-size: 12px;
       }
 
       input[type="checkbox"] {
-        width: 18px;
-        height: 18px;
-        accent-color: var(--accent-strong);
+        width: 16px;
+        height: 16px;
         flex: none;
-        cursor: pointer;
+        accent-color: var(--accent);
       }
 
       .button-row {
         display: flex;
         flex-wrap: wrap;
         gap: 10px;
-        margin-top: 4px;
       }
 
       button {
-        appearance: none;
-        border: 1px solid transparent;
-        min-height: 50px;
-        padding: 0 19px;
-        border-radius: 16px;
+        min-height: 40px;
+        padding: 0 14px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
         cursor: pointer;
-        position: relative;
-        overflow: hidden;
+        background: var(--panel-2);
+        color: var(--text);
+        font-weight: 700;
         transition:
-          transform 0.18s var(--ease),
-          border-color 0.18s var(--ease),
-          background 0.18s var(--ease),
-          box-shadow 0.18s var(--ease),
-          color 0.18s var(--ease),
-          filter 0.18s var(--ease);
-      }
-
-      button::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(110deg, transparent 0%, rgba(255, 255, 255, 0.24) 48%, transparent 70%);
-        transform: translateX(-120%);
-        transition: transform 0.5s var(--ease);
+          background 120ms ease,
+          border-color 120ms ease,
+          color 120ms ease;
       }
 
       button:hover {
-        transform: translateY(-2px);
-      }
-
-      button:hover::before {
-        transform: translateX(120%);
+        border-color: var(--border-strong);
+        background: #1a2028;
       }
 
       button:active {
-        transform: translateY(1px) scale(0.99);
+        background: #0f1318;
       }
 
       button:focus-visible {
         outline: none;
-        box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.18);
+        box-shadow: 0 0 0 2px rgba(95, 179, 255, 0.16);
       }
 
       .btn-primary {
-        background: linear-gradient(135deg, #f8fbff 0%, #9be5ff 35%, #38bdf8 72%, #0ea5e9 100%);
-        color: #06111d;
-        font-weight: 900;
-        box-shadow:
-          0 16px 34px rgba(56, 189, 248, 0.22),
-          inset 0 1px 0 rgba(255, 255, 255, 0.62);
+        border-color: #2f6f9e;
+        background: #176394;
+        color: white;
       }
 
       .btn-primary:hover {
-        box-shadow:
-          0 20px 42px rgba(56, 189, 248, 0.3),
-          0 0 42px rgba(56, 189, 248, 0.13),
-          inset 0 1px 0 rgba(255, 255, 255, 0.7);
-        filter: saturate(1.1);
+        border-color: #3c86bd;
+        background: #1b73ab;
       }
 
       .btn-ghost {
-        background:
-          linear-gradient(180deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.025)),
-          rgba(255, 255, 255, 0.03);
-        border-color: rgba(185, 214, 255, 0.12);
-        color: var(--text);
-        font-weight: 800;
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
-      }
-
-      .btn-ghost:hover {
-        background: rgba(125, 211, 252, 0.07);
-        border-color: rgba(125, 211, 252, 0.24);
-      }
-
-      .ripple {
-        position: absolute;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.44);
-        transform: translate(-50%, -50%) scale(0);
-        pointer-events: none;
-        width: 12px;
-        height: 12px;
-        animation: ripple 0.58s ease-out forwards;
+        background: var(--panel-3);
       }
 
       .info-grid {
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 12px;
+        gap: 10px;
       }
 
       .info-card {
-        min-height: 118px;
-        border-radius: var(--radius-md);
+        min-width: 0;
+        padding: 12px;
         border: 1px solid var(--border);
-        background:
-          radial-gradient(circle at top left, rgba(125, 211, 252, 0.11), transparent 45%),
-          linear-gradient(180deg, rgba(255, 255, 255, 0.065), rgba(255, 255, 255, 0.022)),
-          rgba(255, 255, 255, 0.025);
-        padding: 15px;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        gap: 10px;
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
-        transition: transform 0.24s var(--ease), border-color 0.24s var(--ease), background 0.24s var(--ease);
-      }
-
-      .info-card:hover {
-        transform: translateY(-3px) scale(1.01);
-        border-color: rgba(125, 211, 252, 0.22);
-        background:
-          radial-gradient(circle at top left, rgba(125, 211, 252, 0.16), transparent 45%),
-          rgba(255, 255, 255, 0.045);
+        border-radius: var(--radius-sm);
+        background: var(--panel-3);
       }
 
       .info-card__label {
-        color: var(--text-tertiary);
+        color: var(--muted);
         font-size: 11px;
-        text-transform: uppercase;
-        letter-spacing: 0.14em;
-        font-weight: 800;
+        font-weight: 600;
       }
 
       .info-card__value {
-        font-size: 1.23rem;
-        font-weight: 900;
-        letter-spacing: -0.04em;
-        color: #f8fbff;
+        margin-top: 8px;
+        color: var(--text);
+        font-size: 15px;
+        font-weight: 700;
         word-break: break-word;
       }
 
       .info-card__meta {
-        color: var(--text-tertiary);
-        font-size: 12px;
-        line-height: 1.5;
+        margin-top: 4px;
+        color: var(--muted-2);
+        font-size: 11px;
       }
 
       .progress-shell {
         display: flex;
         flex-direction: column;
-        gap: 12px;
+        gap: 10px;
       }
 
       .progress-track {
         width: 100%;
-        height: 13px;
-        border-radius: var(--radius-pill);
-        background: rgba(255, 255, 255, 0.055);
-        border: 1px solid rgba(185, 214, 255, 0.1);
+        height: 8px;
         overflow: hidden;
-        box-shadow:
-          inset 0 1px 4px rgba(0, 0, 0, 0.42),
-          0 0 28px rgba(56, 189, 248, 0.04);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-xs);
+        background: #090b0e;
       }
 
       .progress-bar {
         width: 0%;
         height: 100%;
-        border-radius: inherit;
-        background:
-          linear-gradient(90deg, #a7efff, #38bdf8, #2563eb, #38bdf8),
-          linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.75), transparent);
-        background-size: 180% 100%, 100% 100%;
-        box-shadow: 0 0 22px rgba(56, 189, 248, 0.42);
-        transition: width 0.34s var(--ease);
-        position: relative;
-        animation: progressFlow 1.8s linear infinite;
-      }
-
-      .progress-bar::after {
-        content: "";
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(110deg, transparent 0%, rgba(255, 255, 255, 0.55) 42%, transparent 70%);
-        transform: translateX(-110%);
-        animation: progressShine 1.35s ease-in-out infinite;
+        border-radius: 0;
+        background: var(--accent);
+        transition: width 240ms ease;
       }
 
       .progress-meta {
@@ -792,63 +490,52 @@
         align-items: center;
         justify-content: space-between;
         gap: 12px;
-        color: var(--text-secondary);
-        font-size: 13px;
+        color: var(--muted);
+        font-size: 12px;
       }
 
       #progressPercent {
-        color: #d9f5ff;
+        color: var(--text);
       }
 
       .toast {
-        min-height: 19px;
+        min-height: 18px;
         color: var(--accent);
         font-size: 12px;
         opacity: 0;
-        transform: translateY(6px) scale(0.98);
-        transition: opacity 0.22s var(--ease), transform 0.22s var(--ease);
+        transition: opacity 120ms ease;
       }
 
       .toast.show {
         opacity: 1;
-        transform: translateY(0) scale(1);
       }
 
       .permalink-box {
-        padding: 15px;
-        border-radius: 16px;
+        padding: 12px;
         border: 1px solid var(--border);
-        background:
-          radial-gradient(circle at top right, rgba(56, 189, 248, 0.1), transparent 36%),
-          rgba(255, 255, 255, 0.032);
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.045);
+        border-radius: var(--radius-sm);
+        background: var(--panel-3);
       }
 
       .permalink-box__label {
-        color: var(--text-tertiary);
+        margin-bottom: 7px;
+        color: var(--muted);
         font-size: 11px;
-        text-transform: uppercase;
-        letter-spacing: 0.14em;
-        font-weight: 800;
+        font-weight: 600;
       }
 
       .permalink-box code {
         display: block;
-        font-family: "IBM Plex Mono", ui-monospace, monospace;
+        color: #b9dfff;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
         font-size: 12px;
-        line-height: 1.65;
-        color: #d9f5ff;
-        word-break: break-all;
+        line-height: 1.55;
         white-space: pre-wrap;
+        word-break: break-all;
       }
 
-      .log-panel {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
+      .log-panel .panel-body {
+        padding: 0;
       }
 
       .log-header {
@@ -858,57 +545,30 @@
         gap: 12px;
       }
 
-      .log-header span:first-child {
-        font-size: 11px;
-        text-transform: uppercase;
-        letter-spacing: 0.16em;
-        color: var(--text-tertiary);
-        font-weight: 800;
-      }
-
       .log-chip {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        min-height: 29px;
-        padding: 0 10px;
-        border-radius: var(--radius-pill);
-        border: 1px solid rgba(185, 214, 255, 0.1);
-        background: rgba(255, 255, 255, 0.034);
-        color: var(--text-tertiary);
-        font-size: 11px;
-        font-weight: 800;
-      }
-
-      .log-chip::before {
-        content: "";
-        width: 7px;
-        height: 7px;
-        border-radius: 50%;
-        background: var(--accent-strong);
-        box-shadow: 0 0 14px rgba(56, 189, 248, 0.7);
+        padding: 4px 7px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-xs);
+        background: var(--panel-3);
+        color: var(--muted);
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        font-size: 10px;
+        font-weight: 600;
       }
 
       #consoleText {
         display: block;
         min-height: 320px;
-        max-height: 420px;
+        max-height: 430px;
         overflow: auto;
-        padding: 15px;
-        border-radius: 18px;
-        border: 1px solid rgba(185, 214, 255, 0.09);
-        background:
-          linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.012)),
-          rgba(3, 7, 15, 0.88);
-        color: #bde8ff;
-        font-family: "IBM Plex Mono", ui-monospace, monospace;
+        padding: 14px;
+        background: #080a0d;
+        color: #b6c9d8;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
         font-size: 12px;
-        line-height: 1.72;
+        line-height: 1.6;
         white-space: pre-wrap;
-        box-shadow:
-          inset 0 1px 0 rgba(255, 255, 255, 0.045),
-          inset 0 0 40px rgba(56, 189, 248, 0.035);
-        scrollbar-color: rgba(125, 211, 252, 0.42) rgba(255, 255, 255, 0.035);
+        scrollbar-color: #39424e #101419;
         scrollbar-width: thin;
       }
 
@@ -918,42 +578,41 @@
       }
 
       #consoleText::-webkit-scrollbar-track {
-        background: rgba(255, 255, 255, 0.035);
-        border-radius: 999px;
+        background: #101419;
       }
 
       #consoleText::-webkit-scrollbar-thumb {
-        background: rgba(125, 211, 252, 0.34);
-        border: 2px solid rgba(3, 7, 15, 0.88);
-        border-radius: 999px;
+        border: 2px solid #101419;
+        border-radius: var(--radius-xs);
+        background: #39424e;
       }
 
       .footer-note {
-        color: var(--text-tertiary);
-        font-size: 12px;
-        line-height: 1.62;
+        padding: 11px 14px;
+        border-top: 1px solid var(--border);
+        background: var(--panel-2);
+        color: var(--muted-2);
+        font-size: 11px;
       }
 
       noscript {
         position: fixed;
         inset: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: rgba(7, 9, 17, 0.96);
+        display: grid;
+        place-items: center;
+        padding: 24px;
+        background: var(--bg);
         z-index: 9999;
       }
 
       noscript p {
-        width: min(460px, calc(100% - 32px));
+        width: min(440px, 100%);
         margin: 0;
-        padding: 18px 20px;
-        border-radius: 18px;
-        border: 1px solid rgba(255, 95, 115, 0.36);
-        background: #0c101b;
-        color: #fecaca;
-        font-size: 13px;
-        line-height: 1.6;
+        padding: 14px;
+        border: 1px solid #6f3941;
+        border-radius: var(--radius);
+        background: #191014;
+        color: #ffbdc4;
       }
 
       a[download] {
@@ -963,154 +622,42 @@
         pointer-events: none;
       }
 
-      @keyframes shellIn {
-        from {
-          opacity: 0;
-          transform: translateY(18px) scale(0.985) rotateX(2deg);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0) scale(1) rotateX(0);
-        }
-      }
-
-      @keyframes fadeUp {
-        from {
-          opacity: 0;
-          transform: translateY(14px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-
-      @keyframes cardIn {
-        from {
-          opacity: 0;
-          transform: translateY(18px) scale(0.985);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0) scale(1);
-        }
-      }
-
-      @keyframes gridDrift {
-        from {
-          background-position: 0 0, 0 0;
-        }
-        to {
-          background-position: 72px 72px, 72px 72px;
-        }
-      }
-
-      @keyframes auroraMove {
-        from {
-          transform: translate3d(-1.5%, -1%, 0) scale(1);
-        }
-        to {
-          transform: translate3d(1.5%, 1%, 0) scale(1.035);
-        }
-      }
-
-      @keyframes dotPulse {
-        0%,
-        100% {
-          transform: scale(1);
-        }
-        50% {
-          transform: scale(1.35);
-        }
-      }
-
-      @keyframes sheen {
-        from {
-          transform: translateX(-115%);
-        }
-        to {
-          transform: translateX(115%);
-        }
-      }
-
-      @keyframes progressFlow {
-        from {
-          background-position: 0% 0, 0 0;
-        }
-        to {
-          background-position: 180% 0, 0 0;
-        }
-      }
-
-      @keyframes progressShine {
-        0% {
-          transform: translateX(-110%);
-        }
-        52%,
-        100% {
-          transform: translateX(110%);
-        }
-      }
-
-      @keyframes ripple {
-        to {
-          opacity: 0;
-          transform: translate(-50%, -50%) scale(18);
-        }
-      }
-
-      @media (max-width: 980px) {
+      @media (max-width: 940px) {
         .app-grid {
-          grid-template-columns: minmax(0, 1fr);
+          grid-template-columns: 1fr;
         }
 
-        .hero {
-          flex-direction: column;
+        .intro {
+          grid-template-columns: 1fr;
+          align-items: start;
         }
 
-        .hero-side {
-          align-items: flex-start;
-          min-width: 0;
+        .project-note {
+          max-width: none;
         }
       }
 
-      @media (max-width: 720px) {
+      @media (max-width: 680px) {
         .page {
-          padding: 0;
+          padding: 12px;
         }
 
-        .app-shell {
-          min-height: 100vh;
-          border-radius: 0;
-          border-left: 0;
-          border-right: 0;
+        .topbar {
+          align-items: flex-start;
         }
 
-        .hero,
-        .app-grid {
-          padding-left: 16px;
-          padding-right: 16px;
+        .brand-subtitle {
+          display: none;
         }
 
-        .hero {
-          padding-top: 24px;
-          padding-bottom: 20px;
-        }
-
-        .hero::after {
-          left: 16px;
-          right: 16px;
-        }
-
-        .app-grid {
-          padding-top: 18px;
-          padding-bottom: 22px;
+        .intro {
+          padding: 17px;
         }
 
         .field-grid,
         .toggle-grid,
         .info-grid {
-          grid-template-columns: minmax(0, 1fr);
+          grid-template-columns: 1fr;
         }
 
         .button-row {
@@ -1125,188 +672,129 @@
           min-height: 240px;
           max-height: 320px;
         }
-
-        h1 {
-          font-size: clamp(2.15rem, 13vw, 3.3rem);
-        }
-      }
-
-      @media (prefers-reduced-motion: reduce) {
-        *,
-        *::before,
-        *::after {
-          animation-duration: 0.001ms !important;
-          animation-iteration-count: 1 !important;
-          scroll-behavior: auto !important;
-          transition-duration: 0.001ms !important;
-        }
-
-        .app-shell,
-        .hero-copy,
-        .hero-side,
-        .panel {
-          transform: none !important;
-        }
       }
     </style>
   </head>
   <body>
     <noscript>
-      <p>
-        This site does not work without JavaScript. Enable it and reload the page.
-      </p>
+      <p>This site does not work without JavaScript. Enable it and reload the page.</p>
     </noscript>
 
     <div class="page">
       <div class="app-shell">
-        <header class="hero">
-          <div class="hero-copy">
-            <div class="hero-badge-row">
-              <div class="hero-badge">
-                <span class="hero-badge__dot"></span>
-                <strong>RDD</strong>
-                <span>Client-side downloader</span>
-              </div>
-              <div class="hero-badge">
-                <span>Roblox deployments</span>
-              </div>
+        <header class="topbar">
+          <div class="brand">
+            <div class="brand-mark">RDD</div>
+            <div class="brand-copy">
+              <div class="brand-title">Roblox Deployment Downloader</div>
+              <div class="brand-subtitle">Direct package builder for Roblox deployments</div>
             </div>
-            <h1>Roblox Deployment Downloader</h1>
-            <p>
-              Build direct download links for Roblox player and studio deployments,
-              pin a specific version hash, and package the result without leaving the page.
-            </p>
           </div>
-
-          <div class="hero-side">
-            <div id="statusPill" class="status-pill" data-state="idle">
-              <span class="status-dot"></span>
-              <span id="statusLabel">Idle</span>
-            </div>
-            <div class="hero-note">
-              Original project:
-              <a href="https://github.com/latte-soft/rdd" target="_blank" rel="noreferrer">latte-soft/rdd</a>.
-              Downloads still come directly from the Roblox CDN.
-            </div>
+          <div id="statusPill" class="status-pill" data-state="idle">
+            <span class="status-dot"></span>
+            <span id="statusLabel">Idle</span>
           </div>
         </header>
+
+        <section class="intro">
+          <div class="intro-copy">
+            <div class="kicker">Deployment utility</div>
+            <h1>Download Roblox builds without the extra noise.</h1>
+            <p>Choose a binary, channel, and optional version hash. RDD builds the package in your browser using files served from the Roblox CDN.</p>
+          </div>
+          <div class="project-note">
+            Original project:
+            <a href="https://github.com/latte-soft/rdd" target="_blank" rel="noreferrer">latte-soft/rdd</a>
+          </div>
+        </section>
 
         <main class="app-grid">
           <div class="stack">
             <section class="panel">
               <div class="panel-head">
                 <div class="panel-title">
-                  <span class="eyebrow">Build Config</span>
                   <h2>Deployment request</h2>
-                  <div class="panel-subtitle">
-                    Pick a binary, channel, and optional hash. The original downloader
-                    IDs are preserved so the existing RDD logic keeps working.
-                  </div>
+                  <div class="panel-subtitle">Configure the build you want to fetch.</div>
                 </div>
               </div>
+              <div class="panel-body">
+                <div hidden id="downloadFormDiv">
+                  <form id="downloadForm" action="">
+                    <div class="field-grid">
+                      <div class="field">
+                        <label for="binaryType">Binary type</label>
+                        <select id="binaryType" name="binaryType">
+                          <option value="WindowsPlayer">WindowsPlayer</option>
+                          <option value="WindowsStudio64">WindowsStudio64</option>
+                          <option value="MacPlayer">MacPlayer</option>
+                          <option value="MacStudio">MacStudio</option>
+                        </select>
+                      </div>
 
-              <div hidden id="downloadFormDiv">
-                <form id="downloadForm" action="">
-                  <div class="field-grid">
-                    <div class="field">
-                      <label for="binaryType">Binary type</label>
-                      <select id="binaryType" name="binaryType">
-                        <option value="WindowsPlayer">WindowsPlayer</option>
-                        <option value="WindowsStudio64">WindowsStudio64</option>
-                        <option value="MacPlayer">MacPlayer</option>
-                        <option value="MacStudio">MacStudio</option>
-                      </select>
+                      <div class="field">
+                        <label for="channel">Channel</label>
+                        <input id="channel" name="channel" type="text" placeholder="production" />
+                      </div>
+
+                      <div class="field">
+                        <label for="version">Version hash</label>
+                        <input id="version" name="version" type="text" placeholder="version-xxxxxxxxxxxxxxxx" />
+                      </div>
+
+                      <div class="field">
+                        <label for="compressionLevel">Compression level</label>
+                        <input id="compressionLevel" name="compressionLevel" type="number" min="1" max="9" value="5" />
+                      </div>
                     </div>
 
-                    <div class="field">
-                      <label for="channel">Channel</label>
-                      <input
-                        id="channel"
-                        name="channel"
-                        type="text"
-                        placeholder="production"
-                      />
+                    <div class="toggle-grid" style="margin-top: 14px">
+                      <label class="toggle" for="compressZip">
+                        <input id="compressZip" name="compressZip" type="checkbox" />
+                        <span>Compress output zip</span>
+                      </label>
+
+                      <div class="toggle" aria-hidden="true">
+                        <span>CDN: setup-aws.rbxcdn.com</span>
+                      </div>
                     </div>
 
-                    <div class="field">
-                      <label for="version">Version hash</label>
-                      <input
-                        id="version"
-                        name="version"
-                        type="text"
-                        placeholder="version-xxxxxxxxxxxxxxxx"
-                      />
+                    <div class="button-row" style="margin-top: 14px">
+                      <button id="downloadButton" type="button" class="btn-primary" onclick="downloadFromForm();">
+                        Download deployment
+                      </button>
+                      <button id="copyLinkButton" type="button" class="btn-ghost" onclick="copyPermLink();">
+                        Copy permanent link
+                      </button>
                     </div>
-
-                    <div class="field">
-                      <label for="compressionLevel">Compression level</label>
-                      <input
-                        id="compressionLevel"
-                        name="compressionLevel"
-                        type="number"
-                        min="1"
-                        max="9"
-                        value="5"
-                      />
-                    </div>
-                  </div>
-
-                  <div class="toggle-grid" style="margin-top: 14px">
-                    <label class="toggle" for="compressZip">
-                      <input id="compressZip" name="compressZip" type="checkbox" />
-                      <span>Compress output zip</span>
-                    </label>
-
-                    <div class="toggle" aria-hidden="true">
-                      <span>Source: setup-aws.rbxcdn.com</span>
-                    </div>
-                  </div>
-
-                  <div class="button-row" style="margin-top: 16px">
-                    <button
-                      id="downloadButton"
-                      type="button"
-                      class="btn-primary"
-                      onclick="downloadFromForm();"
-                    >
-                      Download deployment
-                    </button>
-                    <button
-                      id="copyLinkButton"
-                      type="button"
-                      class="btn-ghost"
-                      onclick="copyPermLink();"
-                    >
-                      Copy permanent link
-                    </button>
-                  </div>
-                </form>
+                  </form>
+                </div>
               </div>
             </section>
 
             <section class="panel">
               <div class="panel-head">
                 <div class="panel-title">
-                  <span class="eyebrow">Snapshot</span>
-                  <h2>Quick details</h2>
+                  <h2>Current selection</h2>
+                  <div class="panel-subtitle">Live values from the deployment form.</div>
                 </div>
               </div>
-
-              <div class="info-grid">
-                <div class="info-card">
-                  <div class="info-card__label">Binary</div>
-                  <div id="summaryBinary" class="info-card__value">WindowsPlayer</div>
-                  <div class="info-card__meta">Current selected Roblox binary.</div>
-                </div>
-                <div class="info-card">
-                  <div class="info-card__label">Channel</div>
-                  <div id="summaryChannel" class="info-card__value">production</div>
-                  <div class="info-card__meta">Defaults to production if left blank.</div>
-                </div>
-                <div class="info-card">
-                  <div class="info-card__label">Version</div>
-                  <div id="summaryVersion" class="info-card__value">Latest</div>
-                  <div class="info-card__meta">Specific hash is optional.</div>
+              <div class="panel-body">
+                <div class="info-grid">
+                  <div class="info-card">
+                    <div class="info-card__label">Binary</div>
+                    <div id="summaryBinary" class="info-card__value">WindowsPlayer</div>
+                    <div class="info-card__meta">Selected executable target</div>
+                  </div>
+                  <div class="info-card">
+                    <div class="info-card__label">Channel</div>
+                    <div id="summaryChannel" class="info-card__value">production</div>
+                    <div class="info-card__meta">Production when left blank</div>
+                  </div>
+                  <div class="info-card">
+                    <div class="info-card__label">Version</div>
+                    <div id="summaryVersion" class="info-card__value">Latest</div>
+                    <div class="info-card__meta">Optional pinned hash</div>
+                  </div>
                 </div>
               </div>
             </section>
@@ -1316,45 +804,49 @@
             <section class="panel">
               <div class="panel-head">
                 <div class="panel-title">
-                  <span class="eyebrow">Progress</span>
                   <h2>Download state</h2>
+                  <div class="panel-subtitle">Package assembly progress.</div>
                 </div>
               </div>
-
-              <div class="progress-shell">
-                <div class="progress-track">
-                  <div id="progressBar" class="progress-bar" style="width: 0%"></div>
+              <div class="panel-body">
+                <div class="progress-shell">
+                  <div class="progress-track">
+                    <div id="progressBar" class="progress-bar" style="width: 0%"></div>
+                  </div>
+                  <div class="progress-meta">
+                    <span id="progressLabel">Waiting to start...</span>
+                    <strong id="progressPercent">0%</strong>
+                  </div>
+                  <div id="toast" class="toast"></div>
                 </div>
-                <div class="progress-meta">
-                  <span id="progressLabel">Waiting to start...</span>
-                  <strong id="progressPercent">0%</strong>
-                </div>
-                <div id="toast" class="toast"></div>
               </div>
             </section>
 
             <section class="panel">
               <div class="panel-head">
                 <div class="panel-title">
-                  <span class="eyebrow">Permalink</span>
-                  <h2>Generated request</h2>
+                  <h2>Permanent link</h2>
+                  <div class="panel-subtitle">Shareable request generated from the form.</div>
                 </div>
               </div>
-
-              <div class="permalink-box">
-                <div class="permalink-box__label">Current link</div>
-                <code id="permalinkPreview">Waiting for form data...</code>
+              <div class="panel-body">
+                <div class="permalink-box">
+                  <div class="permalink-box__label">Current URL</div>
+                  <code id="permalinkPreview">Waiting for form data...</code>
+                </div>
               </div>
             </section>
 
             <section class="panel log-panel">
-              <div class="log-header">
-                <span>Download log</span>
-                <span class="log-chip">Live output</span>
+              <div class="panel-head">
+                <div class="panel-title">
+                  <h2>Download log</h2>
+                </div>
+                <span class="log-chip">LIVE</span>
               </div>
-              <output id="consoleText"></output>
-              <div class="footer-note">
-                If the browser blocks a download, allow popups/downloads for this page and try again.
+              <div class="panel-body">
+                <output id="consoleText"></output>
+                <div class="footer-note">If your browser blocks a download, allow downloads for this page and retry.</div>
               </div>
             </section>
           </div>
