@@ -14,43 +14,20 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Patch legacy bootstrap and page
+      - name: Fix Pages-relative cache path
         shell: python
         run: |
           from pathlib import Path
 
-          js_path = Path("src/js/rdd.js")
-          js = js_path.read_text(encoding="utf-8")
-          old = "\nmain();\n"
-          new = "\nif (!window.__RDD_ENHANCED__) main();\n"
-          if new not in js:
-              if old not in js:
-                  raise SystemExit("Could not locate legacy main() call")
-              js = js.replace(old, new, 1)
-              js_path.write_text(js, encoding="utf-8")
-
-          html_path = Path("src/index.html")
-          html = html_path.read_text(encoding="utf-8")
-
-          manifest = '    <link rel="manifest" href="manifest.webmanifest" />\n    <meta name="theme-color" content="#0b0d10" />\n'
-          if 'rel="manifest"' not in html:
-              marker = '    <link rel="icon" href="favicon.svg" />\n'
-              html = html.replace(marker, marker + manifest, 1)
-
-          enhanced_script = '    <script src="js/rdd-enhancements.js"></script>\n'
-          legacy_script = '    <script src="js/rdd.js"></script>\n'
-          if enhanced_script not in html:
-              html = html.replace(legacy_script, enhanced_script + legacy_script, 1)
-
-          legacy_inline_start = html.find('    <script>\n      (function () {', html.find(legacy_script))
-          if legacy_inline_start != -1:
-              legacy_inline_end = html.find('    </script>', legacy_inline_start)
-              if legacy_inline_end == -1:
-                  raise SystemExit("Could not locate end of legacy inline UI script")
-              legacy_inline_end += len('    </script>')
-              html = html[:legacy_inline_start] + html[legacy_inline_end:]
-
-          html_path.write_text(html, encoding="utf-8")
+          path = Path("src/js/rdd-enhancements.js")
+          text = path.read_text(encoding="utf-8")
+          old = 'const CACHE_URL = "../api/versions/index.json";'
+          new = 'const CACHE_URL = "api/versions/index.json";'
+          if old in text:
+              text = text.replace(old, new, 1)
+              path.write_text(text, encoding="utf-8")
+          elif new not in text:
+              raise SystemExit("Could not locate RDD cache URL")
 
       - name: Commit patch
         shell: bash
@@ -59,8 +36,8 @@ jobs:
           if git status --porcelain | grep -q .; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add src/index.html src/js/rdd.js
-            git commit -m "feat: activate enhanced RDD frontend"
+            git add src/js/rdd-enhancements.js
+            git commit -m "fix: resolve version cache from Pages root"
             git pull --rebase origin main
             git push origin HEAD:main
           else
