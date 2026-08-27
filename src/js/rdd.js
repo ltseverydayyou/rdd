@@ -254,7 +254,7 @@ let versionPath;
 let binExtractRoots;
 let zip;
 
-main();
+if (!window.__RDD_ENHANCED__) main();
 
 function main() {
     if (window.location.search === "") {
