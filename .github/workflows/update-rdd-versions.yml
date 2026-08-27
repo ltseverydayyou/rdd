@@ -5,6 +5,13 @@ on:
     - cron: "*/30 * * * *"
   workflow_dispatch:
 
+permissions:
+  contents: write
+
+concurrency:
+  group: rdd-version-cache
+  cancel-in-progress: true
+
 jobs:
   update-versions:
     runs-on: ubuntu-latest
@@ -12,37 +19,165 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Fetch versions from WEAO
+      - name: Fetch version sources
+        shell: bash
         run: |
-          mkdir -p api/versions
+          set -euo pipefail
+          mkdir -p api/versions/.tmp
 
-          curl -sS "https://weao.xyz/api/versions/current" \
-            -H "User-Agent: WEAO-3PService" \
-            -o api/versions/current.json
+          fetch_optional() {
+            local url="$1"
+            local output="$2"
+            shift 2
+            if curl -fsS --retry 3 --retry-delay 2 "$url" "$@" -o "$output.tmp"; then
+              mv "$output.tmp" "$output"
+            else
+              rm -f "$output.tmp"
+              echo "Warning: failed to refresh $url; keeping any existing cache file"
+            fi
+          }
 
-          curl -sS "https://weao.xyz/api/versions/future" \
-            -H "User-Agent: WEAO-3PService" \
-            -o api/versions/future.json
+          fetch_optional "https://weao.xyz/api/versions/current" "api/versions/current.json" -H "User-Agent: WEAO-3PService"
+          fetch_optional "https://weao.xyz/api/versions/future" "api/versions/future.json" -H "User-Agent: WEAO-3PService"
+          fetch_optional "https://weao.xyz/api/versions/past" "api/versions/past.json" -H "User-Agent: WEAO-3PService"
+          fetch_optional "https://weao.xyz/api/versions/android" "api/versions/android.json" -H "User-Agent: WEAO-3PService"
 
-          curl -sS "https://weao.xyz/api/versions/past" \
-            -H "User-Agent: WEAO-3PService" \
-            -o api/versions/past.json
+          for binary in WindowsPlayer WindowsStudio64 MacPlayer MacStudio; do
+            fetch_optional \
+              "https://clientsettingscdn.roblox.com/v2/client-version/${binary}" \
+              "api/versions/.tmp/${binary}.json"
+          done
 
-          curl -sS "https://weao.xyz/api/versions/android" \
-            -H "User-Agent: WEAO-3PService" \
-            -o api/versions/android.json
+      - name: Build normalized cache and rolling history
+        shell: python
+        run: |
+          import json
+          from datetime import datetime, timezone
+          from pathlib import Path
+
+          root = Path("api/versions")
+          tmp = root / ".tmp"
+          now = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+
+          def load(path, default=None):
+              try:
+                  return json.loads(Path(path).read_text(encoding="utf-8"))
+              except Exception:
+                  return {} if default is None else default
+
+          weao_current = load(root / "current.json")
+          weao_future = load(root / "future.json")
+          weao_past = load(root / "past.json")
+          existing_history = load(root / "history.json", {})
+
+          binary_meta = {
+              "WindowsPlayer": ("Windows", False),
+              "WindowsStudio64": ("Windows", True),
+              "MacPlayer": ("Mac", False),
+              "MacStudio": ("Mac", True),
+          }
+
+          current = {}
+          previous = {}
+          future = {}
+          history = {key: list(existing_history.get(key, [])) for key in binary_meta}
+
+          def version_entry(version, date=None, source=None, approximate=False, display_version=None, bootstrapper_version=None):
+              if not version:
+                  return None
+              entry = {
+                  "version": version,
+                  "date": date,
+                  "source": source,
+                  "approximate": bool(approximate),
+              }
+              if display_version:
+                  entry["displayVersion"] = display_version
+              if bootstrapper_version:
+                  entry["bootstrapperVersion"] = bootstrapper_version
+              return entry
+
+          for binary, (platform, is_studio) in binary_meta.items():
+              official = load(tmp / f"{binary}.json")
+              official_version = official.get("clientVersionUpload")
+              fallback_version = weao_current.get(platform)
+              current[binary] = version_entry(
+                  official_version or fallback_version,
+                  weao_current.get(f"{platform}Date"),
+                  "roblox-clientsettings" if official_version else "weao-current",
+                  False,
+                  official.get("version"),
+                  official.get("bootstrapperVersion"),
+              )
+
+              previous[binary] = version_entry(
+                  weao_past.get(platform),
+                  weao_past.get(f"{platform}Date"),
+                  "weao-past",
+                  is_studio,
+              )
+              future[binary] = version_entry(
+                  weao_future.get(platform),
+                  weao_future.get(f"{platform}Date"),
+                  "weao-future",
+                  is_studio,
+              )
+
+              candidates = []
+              if current[binary]:
+                  candidates.append({
+                      "version": current[binary]["version"],
+                      "observedAt": now,
+                      "source": current[binary]["source"],
+                  })
+              if not is_studio and previous[binary]:
+                  candidates.append({
+                      "version": previous[binary]["version"],
+                      "observedAt": previous[binary].get("date") or now,
+                      "source": "weao-past",
+                  })
+
+              merged = candidates + history[binary]
+              seen = set()
+              deduped = []
+              for item in merged:
+                  version = item.get("version")
+                  if not version or version in seen:
+                      continue
+                  seen.add(version)
+                  deduped.append(item)
+                  if len(deduped) >= 100:
+                      break
+              history[binary] = deduped
+
+          normalized = {
+              "schema": 1,
+              "generatedAt": now,
+              "current": current,
+              "previous": previous,
+              "future": future,
+              "history": history,
+          }
+
+          (root / "index.json").write_text(json.dumps(normalized, separators=(",", ":")) + "\n", encoding="utf-8")
+          (root / "history.json").write_text(json.dumps(history, separators=(",", ":")) + "\n", encoding="utf-8")
 
       - name: Commit and push if changed
+        shell: bash
         run: |
-          if git status --porcelain | grep .; then
+          set -euo pipefail
+          rm -rf api/versions/.tmp
+
+          if git status --porcelain | grep -q .; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add api/versions/*.json
+            git add api/versions
             git commit -m "chore: update RDD version cache"
-            git push
+            git pull --rebase origin main
+            git push origin HEAD:main
           else
             echo "No changes to commit"
           fi
-        env:
-          GIT_TERMINAL_PROMPT: "0"

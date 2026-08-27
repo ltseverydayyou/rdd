@@ -1,0 +1,18 @@
+{
+  "name": "RDD - Roblox Deployment Downloader",
+  "short_name": "RDD",
+  "description": "Locally assemble Roblox Player and Studio deployments in your browser.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0b0d10",
+  "theme_color": "#0b0d10",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
