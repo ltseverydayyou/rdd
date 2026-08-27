@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: write
+  actions: write
 
 concurrency:
   group: rdd-version-cache
@@ -55,18 +56,23 @@ jobs:
         shell: python
         run: |
           import json
+          import re
           from datetime import datetime, timezone
           from pathlib import Path
 
           root = Path("api/versions")
           tmp = root / ".tmp"
           now = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+          version_pattern = re.compile(r"^version-[0-9a-fA-F]{8,}$")
 
           def load(path, default=None):
               try:
                   return json.loads(Path(path).read_text(encoding="utf-8"))
               except Exception:
                   return {} if default is None else default
+
+          def valid_version(value):
+              return isinstance(value, str) and bool(version_pattern.fullmatch(value))
 
           weao_current = load(root / "current.json")
           weao_future = load(root / "future.json")
@@ -85,14 +91,13 @@ jobs:
           future = {}
           history = {key: list(existing_history.get(key, [])) for key in binary_meta}
 
-          def version_entry(version, date=None, source=None, approximate=False, display_version=None, bootstrapper_version=None):
-              if not version:
+          def version_entry(version, date=None, source=None, display_version=None, bootstrapper_version=None):
+              if not valid_version(version):
                   return None
               entry = {
-                  "version": version,
+                  "version": version.lower(),
                   "date": date,
                   "source": source,
-                  "approximate": bool(approximate),
               }
               if display_version:
                   entry["displayVersion"] = display_version
@@ -105,26 +110,27 @@ jobs:
               official_version = official.get("clientVersionUpload")
               fallback_version = weao_current.get(platform)
               current[binary] = version_entry(
-                  official_version or fallback_version,
+                  official_version if valid_version(official_version) else fallback_version,
                   weao_current.get(f"{platform}Date"),
-                  "roblox-clientsettings" if official_version else "weao-current",
-                  False,
+                  "roblox-clientsettings" if valid_version(official_version) else "weao-current",
                   official.get("version"),
                   official.get("bootstrapperVersion"),
               )
 
-              previous[binary] = version_entry(
-                  weao_past.get(platform),
-                  weao_past.get(f"{platform}Date"),
-                  "weao-past",
-                  is_studio,
-              )
-              future[binary] = version_entry(
-                  weao_future.get(platform),
-                  weao_future.get(f"{platform}Date"),
-                  "weao-future",
-                  is_studio,
-              )
+              if is_studio:
+                  previous[binary] = None
+                  future[binary] = None
+              else:
+                  previous[binary] = version_entry(
+                      weao_past.get(platform),
+                      weao_past.get(f"{platform}Date"),
+                      "weao-past",
+                  )
+                  future[binary] = version_entry(
+                      weao_future.get(platform),
+                      weao_future.get(f"{platform}Date"),
+                      "weao-future",
+                  )
 
               candidates = []
               if current[binary]:
@@ -133,7 +139,7 @@ jobs:
                       "observedAt": now,
                       "source": current[binary]["source"],
                   })
-              if not is_studio and previous[binary]:
+              if previous[binary]:
                   candidates.append({
                       "version": previous[binary]["version"],
                       "observedAt": previous[binary].get("date") or now,
@@ -144,11 +150,14 @@ jobs:
               seen = set()
               deduped = []
               for item in merged:
-                  version = item.get("version")
-                  if not version or version in seen:
+                  version = item.get("version") if isinstance(item, dict) else None
+                  if not valid_version(version):
+                      continue
+                  version = version.lower()
+                  if version in seen:
                       continue
                   seen.add(version)
-                  deduped.append(item)
+                  deduped.append({**item, "version": version})
                   if len(deduped) >= 100:
                       break
               history[binary] = deduped
@@ -166,6 +175,7 @@ jobs:
           (root / "history.json").write_text(json.dumps(history, separators=(",", ":")) + "\n", encoding="utf-8")
 
       - name: Commit and push if changed
+        id: commit
         shell: bash
         run: |
           set -euo pipefail
@@ -178,6 +188,14 @@ jobs:
             git commit -m "chore: update RDD version cache"
             git pull --rebase origin main
             git push origin HEAD:main
+            echo "changed=true" >> "$GITHUB_OUTPUT"
           else
             echo "No changes to commit"
+            echo "changed=false" >> "$GITHUB_OUTPUT"
           fi
+
+      - name: Publish refreshed cache to GitHub Pages
+        if: steps.commit.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run deploy-pages.yml --ref main
