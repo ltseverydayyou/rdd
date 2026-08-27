@@ -4,7 +4,7 @@
   window.__RDD_ENHANCED__ = true;
 
   const CDN = "https://setup-aws.rbxcdn.com";
-  const CACHE_URL = "../api/versions/index.json";
+  const CACHE_URL = "api/versions/index.json";
   const DEFAULT_WORKERS = 4;
   const MAX_WORKERS = 8;
   const RETRIES = 2;
