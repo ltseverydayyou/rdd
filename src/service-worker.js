@@ -1,7 +1,9 @@
-const CACHE_NAME = "rdd-ui-v1";
+const CACHE_NAME = "rdd-ui-v3";
 const UI_ASSETS = [
   "./",
   "./index.html",
+  "./ui.css",
+  "./js/rdd-motion.js",
   "./js/rdd.js",
   "./js/rdd-enhancements.js",
   "./js/jszip.min.js",
@@ -31,11 +33,22 @@ self.addEventListener("fetch", event => {
     event.respondWith(fetch(request).catch(() => caches.match(request)));
     return;
   }
-  event.respondWith(
-    caches.match(request).then(cached => cached || fetch(request).then(response => {
-      const clone = response.clone();
-      caches.open(CACHE_NAME).then(cache => cache.put(request, clone));
+  if (request.mode === "navigate") {
+    event.respondWith(fetch(request).then(response => {
+      if (response.ok) {
+        const copy = response.clone();
+        event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.put(request, copy)));
+      }
       return response;
-    }))
-  );
+    }).catch(() => caches.match(request, { ignoreSearch: true }).then(cached => cached || caches.match("./index.html"))));
+    return;
+  }
+  event.respondWith(caches.match(request).then(cached => cached || fetch(request).then(response => {
+    if (response.ok) {
+      const copy = response.clone();
+      event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.put(request, copy)));
+    }
+    return response;
+  })));
+
 });

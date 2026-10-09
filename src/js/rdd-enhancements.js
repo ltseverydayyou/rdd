@@ -79,7 +79,7 @@
   function progress(pct, text) {
     pct = clamp(pct, 0, 100);
     const bar = $("progressBar"), label = $("progressLabel"), value = $("progressPercent");
-    if (bar) bar.style.width = pct + "%";
+    if (bar) { bar.style.width = pct + "%"; bar.parentElement?.setAttribute("aria-valuenow", String(Math.round(pct))); }
     if (label) label.textContent = text || "";
     if (value) value.textContent = Math.round(pct) + "%";
   }
@@ -89,22 +89,14 @@
   }
   function readStore(k, fallback) { try { return JSON.parse(localStorage.getItem(k)) || fallback; } catch (_) { return fallback; } }
 
-  function injectCss() {
-    const style = document.createElement("style");
-    style.textContent = `
-      .rdd-extra-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:12px}.rdd-help{font-size:11px;color:var(--muted-2);margin-top:5px}.rdd-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:12px}.rdd-row select{min-width:180px;flex:1}.rdd-manifest{margin-top:14px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--panel-3);padding:12px}.rdd-packages{display:grid;gap:5px;max-height:280px;overflow:auto;margin-top:9px}.rdd-package{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;align-items:center;padding:7px 9px;border:1px solid var(--border);border-radius:var(--radius-xs);background:var(--panel-2);font-size:12px}.rdd-package span:nth-child(2){overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:ui-monospace,monospace}.rdd-package span:last-child{color:var(--muted-2)}.rdd-recent{display:grid;gap:7px}.rdd-recent-row{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:8px;border:1px solid var(--border);border-radius:var(--radius-xs)}.rdd-recent-row div{min-width:0;display:grid}.rdd-recent-row span{color:var(--muted-2);font-size:11px;overflow:hidden;text-overflow:ellipsis}.rdd-small{padding:5px 9px!important;min-height:30px!important;font-size:12px!important}button:disabled{opacity:.45;cursor:not-allowed}@media(max-width:720px){.rdd-extra-grid{grid-template-columns:1fr}}
-    `;
-    document.head.appendChild(style);
-  }
-
   function field(label, html, help) {
     const d = document.createElement("div"); d.className = "field";
-    d.innerHTML = `<label>${label}</label>${html}${help ? `<div class="rdd-help">${help}</div>` : ""}`;
+    const id = html.match(/\bid="([^"]+)"/);
+    d.innerHTML = `<label${id ? ` for="${id[1]}"` : ""}>${label}</label>${html}${help ? `<div class="rdd-help">${help}</div>` : ""}`;
     return d;
   }
 
   function enhanceUi() {
-    injectCss();
     form = $("downloadForm"); logBox = $("consoleText");
     if (!form) return;
     $("downloadFormDiv").hidden = false;
@@ -138,11 +130,11 @@
     toggles.appendChild(verify);
 
     const buttons = q(".button-row", form);
-    const inspect = document.createElement("button"); inspect.type = "button"; inspect.className = "btn-ghost"; inspect.textContent = "Inspect manifest"; inspect.onclick = inspectManifest;
+    const inspect = document.createElement("button"); inspect.type = "button"; inspect.className = "btn-ghost"; inspect.innerHTML = '<svg class="icon" aria-hidden="true"><use href="#i-file-search"></use></svg> Inspect manifest'; inspect.onclick = inspectManifest;
     buttons.insertBefore(inspect, buttons.lastElementChild);
 
     const presets = document.createElement("div"); presets.className = "rdd-row";
-    presets.innerHTML = '<select id="rddPreset"><option value="">Saved presets...</option></select><button type="button" class="btn-ghost rdd-small" id="rddSavePreset">Save preset</button><button type="button" class="btn-ghost rdd-small" id="rddDeletePreset">Delete preset</button>';
+    presets.innerHTML = '<select id="rddPreset"><option value="">Saved presets...</option></select><button type="button" class="btn-ghost rdd-small" id="rddSavePreset"><svg class="icon icon--sm" aria-hidden="true"><use href="#i-check"></use></svg>Save preset</button><button type="button" class="btn-ghost rdd-small" id="rddDeletePreset">Delete preset</button>';
     buttons.after(presets);
 
     const inspector = document.createElement("div"); inspector.id = "rddManifest"; inspector.className = "rdd-manifest"; inspector.hidden = true;
@@ -152,14 +144,14 @@
     const shell = q(".progress-shell");
     if (shell) {
       const actions = document.createElement("div"); actions.className = "rdd-row";
-      actions.innerHTML = '<button id="rddCancel" type="button" class="btn-ghost rdd-small" disabled>Cancel</button><button id="rddRetry" type="button" class="btn-ghost rdd-small" hidden>Retry</button>';
+      actions.innerHTML = '<button id="rddCancel" type="button" class="btn-ghost rdd-small" disabled><svg class="icon icon--sm" aria-hidden="true"><use href="#i-box"></use></svg>Cancel</button><button id="rddRetry" type="button" class="btn-ghost rdd-small" hidden>Retry</button>';
       shell.appendChild(actions);
     }
 
     const leftStack = q(".app-grid > .stack");
     if (leftStack) {
       const recent = document.createElement("section"); recent.className = "panel";
-      recent.innerHTML = '<div class="panel-head"><div class="panel-title"><h2>Recent downloads</h2><div class="panel-subtitle">Stored locally in this browser only.</div></div></div><div class="panel-body"><div id="rddRecent" class="rdd-recent"></div></div>';
+      recent.innerHTML = '<div class="panel-head"><div class="panel-heading"><div class="panel-symbol"><svg class="icon" aria-hidden="true"><use href="#i-history"></use></svg></div><div class="panel-title"><h2>Recent downloads</h2><div class="panel-subtitle">Stored locally in this browser only.</div></div></div></div><div class="panel-body"><div id="rddRecent" class="rdd-recent"></div></div>';
       leftStack.appendChild(recent);
     }
 

@@ -23,6 +23,12 @@ RDD locally assembles Roblox Player and Studio deployments in the browser using 
 - Shareable permanent links that preserve downloader options.
 - Installable PWA shell for the RDD interface.
 
+## Website and UI
+
+The website uses a responsive dashboard with dedicated layouts for portrait phones, landscape devices, tablets, and desktop windows. The deployment form, progress, manifest inspector, presets, and local download history work without a framework or icon CDN.
+
+Interface icons are based on [Tabler Icons](https://tabler.io/icons), distributed under the MIT License. A copy of the icon license is included at [`src/licenses/tabler-icons-LICENSE.txt`](src/licenses/tabler-icons-LICENSE.txt). The site includes only the SVG paths it needs, without loading an external icon library.
+
 ## Usage
 
 Open the hosted page and choose a binary, channel, version mode, package set, and download options. For most users, leaving the version mode on **Latest** is sufficient.
